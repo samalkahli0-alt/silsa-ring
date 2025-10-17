@@ -35,6 +35,7 @@
     .size-label{font-weight:800}
     .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill);filter:drop-shadow(0 6px 12px rgba(62,0,12,.12))}
     .ring-stroke-inner{stroke:#fff;stroke-width:4;fill:none}
+    .ring-outline{stroke:var(--ink);stroke-width:3;fill:none;}
 
     /* سلايدر المقاس */
     .slider-wrap{display:flex;align-items:center;gap:10px;width:100%}
@@ -121,14 +122,14 @@
         <div class="card calib">
           <div class="note">
             ضعي المسطرة على الشاشة ثم حرّكي الشريط الذهبي حتى يطابق الطول بالسنتيمتر بين الخطّين.<br>
-            المعايرة تضبط فقط حجم الخاتم الظاهري ولا تغيّر إعدادات الصفحة.
+            أقصى معايرة متاحة 5 سم فقط. التعديل يغيّر حجم الخاتم الظاهري فقط.
           </div>
           <div>
             <label>مرجع المعايرة (سم)</label>
-            <input id="refCm" type="number" min="1" max="10" step="0.1" value="3">
+            <input id="refCm" type="number" min="1" max="5" step="0.1" value="3">
           </div>
           <div id="calibBar" class="bar"></div>
-          <input id="calibSlider" type="range" min="150" max="1000" step="1" value="300" class="big">
+          <input id="calibSlider" type="range" min="100" max="500" step="1" value="300" class="big">
           <div style="text-align:center;margin-top:8px">
             <span class="badge" id="pxBadge">1 مم ≈ — بكسل</span>
           </div>
@@ -137,7 +138,7 @@
 
       <div class="card canvas-card">
         <div id="sizeLabel" class="size-label">المقاس الحالي: — (US)</div>
-        <svg id="ringSvg" viewBox="0 0 360 360" aria-label="خاتم تفاعلي">
+        <svg id="ringSvg" viewBox="0 0 360 360">
           <defs>
             <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#d9d9d9"/><stop offset="50%" stop-color="#f3f3f3"/><stop offset="100%" stop-color="#c6c6c6"/>
@@ -148,6 +149,7 @@
           </defs>
           <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
           <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
+          <circle id="outline" class="ring-outline" cx="180" cy="190" r="66" />
         </svg>
         <div class="slider-wrap">
           <span class="hint">4</span>
@@ -160,7 +162,7 @@
   </div>
 
   <script>
-    const PI=Math.PI, US_MIN=4, US_MAX=14;
+    const PI=Math.PI,US_MIN=4,US_MAX=14;
     const usToDiameter=us=>11.63+0.8128*us;
     const diameterToUs=d=>(d-11.63)/0.8128;
     const diameterToCirc=d=>PI*d;
@@ -173,15 +175,14 @@
 
     const $=id=>document.getElementById(id);
     const el={
-      thickness:$("thickness"), us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"), diameter:$("diameter"), circ:$("circ"),
-      error:$("error"), laser:$("laser"), slider:$("slider"), sizeLabel:$("sizeLabel"),
-      outer:$("outer"), inner:$("inner"),
-      refCm:$("refCm"), calibSlider:$("calibSlider"), calibBar:$("calibBar"), pxBadge:$("pxBadge")
+      thickness:$("thickness"),us:$("us"),uk:$("uk"),fr:$("fr"),jp:$("jp"),diameter:$("diameter"),circ:$("circ"),
+      error:$("error"),laser:$("laser"),slider:$("slider"),sizeLabel:$("sizeLabel"),
+      outer:$("outer"),inner:$("inner"),outline:$("outline"),
+      refCm:$("refCm"),calibSlider:$("calibSlider"),calibBar:$("calibBar"),pxBadge:$("pxBadge")
     };
 
     let updating=false;
     let pxPerMM=6.8;
-
     const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
     const tryNum=v=>{if(v==null)return null;v=(""+v).trim();if(!v||v==='.'||v==='-'||v==='-.')return null;const n=Number(v);return Number.isFinite(n)?n:null;};
     function setError(msg){el.error.textContent=msg||"";if(msg)el.laser.textContent="";}
@@ -190,15 +191,16 @@
       const rPx=(diameterMM/2)*pxPerMM;
       el.outer.setAttribute("r",rPx);
       el.inner.setAttribute("r",rPx/1.7);
+      el.outline.setAttribute("r",rPx+6);
     }
 
     function updateAllFromUS(us){
       if(us<US_MIN||us>US_MAX){setError("❌ المقاس خارج النطاق (4 – 14)");return;}
       setError("");
-      const d=usToDiameter(us), c=diameterToCirc(d);
+      const d=usToDiameter(us),c=diameterToCirc(d);
       const fr=c,jp=usToJP(us),uk=usToUK(us);
       updating=true;
-      el.us.value=fmt(us,2); el.uk.value=uk; el.fr.value=fmt(fr,1); el.jp.value=fmt(jp,1); el.diameter.value=fmt(d,2); el.circ.value=fmt(c,1); el.slider.value=us;
+      el.us.value=fmt(us,2);el.uk.value=uk;el.fr.value=fmt(fr,1);el.jp.value=fmt(jp,1);el.diameter.value=fmt(d,2);el.circ.value=fmt(c,1);el.slider.value=us;
       updating=false;
       el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
       drawRing(d);
@@ -206,10 +208,10 @@
       el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;
     }
 
-    // المعايرة
     function applyCalibration(){
-      const refCm=parseFloat(el.refCm.value)||3;
-      const barPx=parseFloat(el.calibSlider.value)||300;
+      const refCm=Math.min(Math.max(parseFloat(el.refCm.value)||3,1),5);
+      const barPx=Math.min(Math.max(parseFloat(el.calibSlider.value)||300,100),500);
+      el.refCm.value=refCm;
       el.calibBar.style.width=`${barPx}px`;
       pxPerMM=barPx/(refCm*10);
       el.pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;
