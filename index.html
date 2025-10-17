@@ -22,7 +22,9 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
 
     label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
-    input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:#fff;outline:none;color:var(--ink)}
+    /* مهم: نجعلها نص وليس number لتسمح بـ . , ٫ */
+    input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;
+      font-size:16px;background:#fff;outline:none;color:var(--ink)}
     input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .full{grid-column:1/-1}
@@ -64,7 +66,7 @@
 <body>
   <div class="wrap">
     <h1>محاكاة مقاس الخاتم — SILSA 💍</h1>
-    <div class="subtitle">اختاري المقاس وشاهدي الخاتم بالحجم الحقيقي على شاشتك. عايِري المسطرة <b>بالسنتيمتر</b> ثم قارني إصبعك بالخاتم.</div>
+    <div class="subtitle">اختاري المقاس وشاهدي الخاتم بالحجم الحقيقي على شاشتك. عايِري المسطرة <b>بالسنتيمتر</b>؛ الحسابات الداخلية تبقى بالـ mm لضمان الدقة.</div>
 
     <div class="grid">
       <!-- الإدخالات -->
@@ -90,19 +92,19 @@
           <div class="full laser" id="laser"></div>
         </div>
 
-        <!-- معايرة بالسنتيمتر -->
+        <!-- معايرة بالسنتيمتر (واجهة فقط) -->
         <div class="card calib">
           <div class="title">🔧 المعايرة (الحجم الواقعي على الشاشة)</div>
           <div class="howto">
             1) ضعي مسطرة على الشاشة.<br/>
             2) حرّكي الشريط حتى يطابق العرض <b id="refText">2.5 سم</b> بدقة بين الخطّين.<br/>
-            3) بعد الضبط، سيظهر الخاتم بالحجم الحقيقي على شاشتك. (الحفظ تلقائي)
+            3) بعد الإفلات، يطبَّق الضبط ويُرسم الخاتم بالحجم الحقيقي. (يُحفظ تلقائيًا)
           </div>
 
           <div class="calib-inner">
             <div>
               <label>مرجع المعايرة (سم)</label>
-              <input id="refCm" type="number" min="1" max="10" step="0.1" value="2.5">
+              <input id="refCm" type="text" value="2.5">
             </div>
             <div>
               <label>تكبير شريط المعايرة</label>
@@ -161,7 +163,7 @@
     const normalizeUK=s=>s.trim().toUpperCase().replace("1/2","½");
     const ukToUs=uk=>{const i=UK_STEPS.indexOf(normalizeUK(uk));if(i<0)return null;return US_MIN+(i/(UK_STEPS.length-1))*(US_MAX-US_MIN)};
 
-    // عناصر DOM
+    // DOM
     const $=id=>document.getElementById(id);
     const el={
       thickness:$("thickness"), us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"), diameter:$("diameter"), circ:$("circ"),
@@ -170,23 +172,21 @@
       refCm:$("refCm"), calibSlider:$("calibSlider"), calibBar:$("calibBar"), refText:$("refText"), pxBadge:$("pxBadge"), resetCal:$("resetCal")
     };
 
-    // الحالة
+    // حالة عامة
     let updating=false;
-    let pxPerMM=6.8; // تحفظ في localStorage
+    let pxPerMM=6.8; // تُحفظ
 
-    // تنسيقات
-    const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
-    // تطبيع الأرقام: تقبل 7.5 و7,5 و7٫5 وأرقام ٠١٢٣٤٥٦٧٨٩
+    // تنسيق الأرقام (يدعم 7.5 و7,5 و7٫5 وأرقام عربية)
     function normalizeNumberString(v){
       if(v==null) return "";
       v=(""+v).trim();
       const arabicDigits={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
       v=v.replace(/[٠-٩]/g,d=>arabicDigits[d]);
-      v=v.replace(/[٬٫,]/g,"."); // فاصلة عربية أو إنجليزية -> نقطة
+      v=v.replace(/[٬٫,]/g,"."); // فاصلة عربية/إنجليزية -> نقطة
       return v;
     }
+    const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
     const tryNum=v=>{v=normalizeNumberString(v); if(!v||v==='.'||v==='-'||v==='-.') return null; const n=Number(v); return Number.isFinite(n)? n: null;};
-
     function setError(msg){ el.error.textContent=msg||""; if(msg) el.laser.textContent=""; }
 
     // رسم الخاتم فقط (يتأثر بالمعايرة)
@@ -223,45 +223,47 @@
       el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*Math.PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;
     }
 
-    // —— المعايرة بالسنتيمتر (cm) —— تحفظ pxPerMM
+    // —— المعايرة بالسنتيمتر (واجهة فقط) ——
     function saveCalibration(){ localStorage.setItem("silsa_pxPerMM", pxPerMM.toFixed(4)); }
     function loadCalibration(){
       const saved=localStorage.getItem("silsa_pxPerMM");
       if(saved){ pxPerMM=parseFloat(saved); el.pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`; }
     }
     function applyCalibration(){
-      const refCm=parseFloat(normalizeNumberString(el.refCm.value))||2.5;   // cm
-      const barPx=parseFloat(el.calibSlider.value)||250;                    // px
+      const refCm=parseFloat( normalizeNumberString(el.refCm.value) ) || 2.5; // cm
+      const barPx=parseFloat(el.calibSlider.value) || 250;                   // px
       el.refText.textContent=`${fmt(refCm,1)} سم`;
       el.calibBar.style.width=`${barPx}px`;
 
-      pxPerMM = barPx / (refCm * 10); // px لكل mm
+      pxPerMM = barPx / (refCm * 10); // px لكل mm (الحساب داخليًا mm)
       el.pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;
 
-      // أعد رسم الخاتم فقط (لا تغيّر القيم)
+      // إعادة رسم الخاتم فقط (لا تغيّر أي قيم)
       const d=tryNum(el.diameter.value);
       if(d!=null) drawRing(d);
 
       saveCalibration();
     }
-    // أثناء السحب: اعرض الشريط فقط، وطبّق الحساب بعد توقف بسيط
-    let calibPending=null;
+
+    // أثناء السحب: مجرّد معاينة عرض الشريط + تحديث الشارة، والحساب عند الإفلات
     el.calibSlider.addEventListener('input', e=>{
-      clearTimeout(calibPending);
-      el.calibBar.style.width=`${e.target.value}px`; // عرض بصري سريع
-      calibPending=setTimeout(applyCalibration, 350);
+      const px=parseFloat(e.target.value)||0;
+      el.calibBar.style.width=`${px}px`;
+      const refCm=parseFloat( normalizeNumberString(el.refCm.value) ) || 2.5;
+      const previewPxPerMM = px / (refCm*10);
+      el.pxBadge.textContent=`1 مم ≈ ${fmt(previewPxPerMM,2)} بكسل`;
     });
-    el.refCm.addEventListener('input', ()=>{ // يطبق مباشرة عند تغيير المرجع
-      applyCalibration();
-    });
+    el.calibSlider.addEventListener('change', applyCalibration);
+    el.refCm.addEventListener('input', applyCalibration);
+
     el.resetCal.addEventListener("click", ()=>{
       localStorage.removeItem("silsa_pxPerMM");
-      pxPerMM=6.8; el.refCm.value=2.5; el.calibSlider.value=250;
+      pxPerMM=6.8; el.refCm.value="2.5"; el.calibSlider.value=250;
       applyCalibration();
       alert("تمت إعادة المعايرة للوضع الافتراضي ✨");
     });
 
-    // معالجات الإدخال من الحقول
+    // معالجات الإدخال (كل خانة → تحويل إلى US ثم تحديث)
     function handleUS(){ if(updating) return; const n=tryNum(el.us.value); if(n==null) return; updateAllFromUS(n); }
     function handleDiameter(){ if(updating) return; const n=tryNum(el.diameter.value); if(n==null) return; updateAllFromUS(diameterToUs(n)); }
     function handleCirc(){ if(updating) return; const n=tryNum(el.circ.value); if(n==null) return; updateAllFromUS(diameterToUs(n/Math.PI)); }
@@ -281,9 +283,9 @@
     el.thickness.addEventListener('change', handleThickness);
 
     // بدء
-    loadCalibration();         // يسترجع pxPerMM
-    updateAllFromUS(8);        // يملأ القيم ويرسم
-    applyCalibration();        // يطبّق المعايرة ويرسم الخاتم فقط
+    loadCalibration();     // يسترجع pxPerMM (إن وُجد)
+    updateAllFromUS(8);    // يملأ القيم ويرسم
+    applyCalibration();    // يطبّق المعايرة ويرسم الخاتم فقط
   </script>
 </body>
 </html>
