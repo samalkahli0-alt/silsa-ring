@@ -1,116 +1,208 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>محاكاة مقاس الخاتم - SILSA</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#ffeed3;
-  --ink:#3e000c;
-  --gold:#b8860b;
-}
-body{background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif;margin:0;padding:0;text-align:center}
-.container{max-width:900px;margin:30px auto;padding:20px;background:#fff4e1;border-radius:20px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
-h1{margin-bottom:10px;font-size:26px;font-weight:800}
-.subtitle{color:var(--ink);margin-bottom:20px}
-svg{max-width:320px;height:auto;display:block;margin:20px auto}
-circle{fill:none;stroke:var(--gold);stroke-width:10}
-.calib-area{margin-top:30px}
-#cmText{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
-.calib-bar{position:relative;height:50px;background:linear-gradient(90deg,#fff2cc,var(--gold));border-radius:25px;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;width:300px;transition:width .25s ease}
-.calib-bar::before,.calib-bar::after{content:"";position:absolute;top:-12px;width:3px;height:74px;background:var(--ink)}
-.calib-bar::before{left:0}.calib-bar::after{right:0}
-input[type=range]{appearance:none;width:100%;max-width:600px;height:10px;background:#dec693;border-radius:5px;outline:none;margin-top:10px}
-input[type=range]::-webkit-slider-thumb{appearance:none;width:28px;height:28px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.2);cursor:pointer}
-input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 3px rgba(0,0,0,.2);cursor:pointer}
-.info{background:var(--bg);border:2px solid var(--gold);border-radius:14px;padding:12px;font-size:15px;line-height:1.8;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:right}
-label{font-weight:500;font-size:15px}
-input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d8b992;font-size:15px}
-.error{color:red;margin-top:5px;font-weight:600;text-align:center}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💎 محاكاة مقاس الخاتم — SILSA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#ffeed3;
+      --ink:#3e000c;
+      --accent:#b8860b;
+      --accent2:#d4af37;
+      --card:#fffaf0;
+      --border:#f1d7b8;
+      --muted:#7e4a55;
+      --navy:#001f3f;
+      --danger:#c81e1e;
+    }
+    body {
+      font-family:'Tajawal', sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      margin:0;
+      padding:0;
+      text-align:center;
+    }
+    h1 {font-size:28px;margin:20px 0 8px;font-weight:800;}
+    .hint {color:var(--muted);font-size:14px;margin-bottom:16px;}
+    .ring-wrap {display:flex;flex-direction:column;align-items:center;}
+    svg {width:300px;height:auto;display:block;margin:0 auto;}
+    .ring-outer{stroke:url(#grad);stroke-width:12;fill:url(#fill);filter:drop-shadow(0 6px 10px rgba(0,0,0,0.15));}
+    .ring-inner{stroke:#fff;stroke-width:3;fill:none;}
+    .diamond{filter:drop-shadow(0 3px 4px rgba(0,0,0,0.2));}
+    @keyframes sparkle{0%{fill:#89CFF0}50%{fill:#bde3fb}100%{fill:#89CFF0}}
+    .sparkle{animation:sparkle 1.2s infinite ease-in-out;}
+    .label {font-weight:800;margin:10px 0;}
+    .slider-wrap {width:85%;max-width:650px;margin:25px auto;}
+    .slider {
+      width:100%;
+      appearance:none;
+      height:16px;
+      background:linear-gradient(90deg,#fff,#e6caa0);
+      border-radius:10px;
+      outline:none;
+      cursor:pointer;
+    }
+    .slider::-webkit-slider-thumb {
+      appearance:none;
+      width:30px;height:30px;
+      border-radius:50%;
+      background:var(--accent2);
+      border:3px solid white;
+      box-shadow:0 0 0 2px rgba(184,134,11,0.3);
+      cursor:pointer;
+    }
+    .calib-section {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      margin:25px auto;
+      padding:20px;
+      width:90%;
+      max-width:700px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    }
+    .calib-bar {
+      background:linear-gradient(90deg,#fff,var(--accent2));
+      border:2px solid var(--accent2);
+      height:28px;
+      border-radius:14px;
+      width:200px;
+      margin:16px auto;
+      position:relative;
+      transition:width 0.25s ease;
+    }
+    .calib-bar::before, .calib-bar::after {
+      content:"";
+      position:absolute;
+      top:-8px;
+      width:3px;height:44px;
+      background:var(--ink);
+    }
+    .calib-bar::before {left:0;}
+    .calib-bar::after {right:0;}
+    button {
+      background:var(--ink);
+      color:var(--bg);
+      border:none;
+      border-radius:12px;
+      padding:8px 14px;
+      font-family:'Tajawal';
+      font-size:15px;
+      cursor:pointer;
+    }
+    .laser {color:var(--navy);font-weight:700;margin-top:10px;white-space:pre-line;}
+    .error {color:var(--danger);font-weight:800;margin-top:8px;}
+  </style>
 </head>
 <body>
-<div class="container">
-<h1>محاكاة مقاس الخاتم 💍</h1>
-<p class="subtitle">اختاري أي مقاس وشاهدي الخاتم بالحجم الحقيقي على شاشتك.</p>
+  <h1>محاكاة مقاس الخاتم — SILSA 💍</h1>
+  <div class="hint">اسحبي الشريط أدناه لمعايرة حجم الشاشة، ثم جربي اختيار المقاس المناسب</div>
 
-<div class="grid">
-<div><label>المقاس الأمريكي (US)</label><input id="us" placeholder="7.5"></div>
-<div><label>المقاس البريطاني (UK)</label><input id="uk" placeholder="K½"></div>
-<div><label>المقاس الفرنسي (FR)</label><input id="fr" placeholder="56.5"></div>
-<div><label>القطر الداخلي (mm)</label><input id="diameter" placeholder="18.1"></div>
-</div>
-<div class="error" id="error"></div>
+  <div class="ring-wrap">
+    <div id="sizeLabel" class="label">المقاس الحالي: 8 (US)</div>
+    <svg viewBox="0 0 360 360">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#d9d9d9"/>
+          <stop offset="50%" stop-color="#f3f3f3"/>
+          <stop offset="100%" stop-color="#bfbfbf"/>
+        </linearGradient>
+        <radialGradient id="fill" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fff"/>
+          <stop offset="100%" stop-color="#e6e6e6"/>
+        </radialGradient>
+      </defs>
+      <circle id="outer" class="ring-outer" cx="180" cy="190" r="60"/>
+      <circle id="inner" class="ring-inner" cx="180" cy="190" r="36"/>
+      <polygon id="diamond" class="diamond sparkle" points="180,90 170,100 180,110 190,100" fill="#89CFF0" stroke="#5a9bd4" stroke-width="2"/>
+    </svg>
 
-<svg viewBox="0 0 400 400">
-<circle id="ring" cx="200" cy="200" r="60"/>
-</svg>
+    <div class="slider-wrap">
+      <input id="slider" type="range" min="4" max="14" step="0.5" value="8" class="slider">
+      <div class="hint">من 4 إلى 14</div>
+    </div>
+    <div id="laser" class="laser"></div>
+    <div id="error" class="error"></div>
+  </div>
 
-<div class="calib-area">
-  <div id="cmText">3.0 سم</div>
-  <div id="calibBar" class="calib-bar"></div>
-  <input id="calibSlider" type="range" min="150" max="600" step="1" value="300">
-</div>
+  <div class="calib-section">
+    <h3>🔧 معايرة المسطرة</h3>
+    <div class="hint">ضعي مسطرة حقيقية على الشاشة واضبطي الشريط ليطابق 25 مم بدقة</div>
+    <input id="calibSlider" type="range" min="100" max="800" step="1" value="150" class="slider" style="height:12px;">
+    <div id="calibBar" class="calib-bar"></div>
+    <div id="pxBadge" class="hint">1 مم ≈ 6.8 بكسل</div>
+    <button id="resetBtn">🔄 إعادة ضبط المعايرة</button>
+  </div>
 
-<div class="info">
-  ضَع المسطرة على الشاشة ثم حرّك الشريط الذهبي حتى يطابق الطول بالسنتيمتر بين الخطّين.<br>
-  بعد الضبط، الخاتم يظهر بالحجم الواقعي. التعديل لا يؤثر على أي بيانات أخرى.
-</div>
-</div>
+  <script>
+    const PI=Math.PI;
+    const outer=document.getElementById('outer');
+    const inner=document.getElementById('inner');
+    const diamond=document.getElementById('diamond');
+    const sizeLabel=document.getElementById('sizeLabel');
+    const laser=document.getElementById('laser');
+    const error=document.getElementById('error');
+    const slider=document.getElementById('slider');
+    const calibSlider=document.getElementById('calibSlider');
+    const calibBar=document.getElementById('calibBar');
+    const pxBadge=document.getElementById('pxBadge');
+    const resetBtn=document.getElementById('resetBtn');
 
-<script>
-const usToDiameter=us=>11.63+0.8128*us;
-const diameterToUs=d=>(d-11.63)/0.8128;
-const ring=document.getElementById("ring");
-const calibSlider=document.getElementById("calibSlider");
-const calibBar=document.getElementById("calibBar");
-const cmText=document.getElementById("cmText");
-const us=document.getElementById("us");
-const diameter=document.getElementById("diameter");
-const error=document.getElementById("error");
+    let pxPerMM=6.8; // افتراضي
+    const fmt=(n,d=1)=>Number(n).toFixed(d).replace(/\\.0+$/,'').replace(/\\.$/,'');
+    const usToDiameter=us=>11.63+0.8128*us;
+    const diameterToCirc=d=>PI*d;
 
-let pxPerMM=6.8;
+    function drawRing(d){
+      const r=(d/2)*pxPerMM;
+      const cx=180,cy=190;
+      outer.setAttribute('r',r);
+      inner.setAttribute('r',r/1.7);
+      const dy=cy-r-20;
+      diamond.setAttribute('points',`${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`);
+    }
 
-function drawRing(mm){
-  const rPx=(mm/2)*pxPerMM;
-  ring.setAttribute("r",rPx);
-}
+    function updateFromUS(us){
+      if(us<4||us>14){error.textContent='❌ المقاس خارج النطاق (4–14)';return;}
+      error.textContent='';
+      const d=usToDiameter(us);
+      drawRing(d);
+      const thick=1.5;
+      laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${(d+thick)*PI} mm\\n(سماكة الفضة: ${thick} mm)`;
+      sizeLabel.textContent=`المقاس الحالي: ${us} (US)`;
+    }
 
-function updateAllFromUS(value){
-  const n=parseFloat(value);
-  if(isNaN(n))return;
-  if(n<4||n>14){error.textContent="❌ المقاس خارج النطاق (4 - 14)";return;}
-  error.textContent="";
-  const d=usToDiameter(n);
-  diameter.value=d.toFixed(2);
-  drawRing(d);
-}
+    function saveCal(){localStorage.setItem('silsapx',pxPerMM.toFixed(4));}
+    function loadCal(){
+      const saved=localStorage.getItem('silsapx');
+      if(saved){pxPerMM=parseFloat(saved);pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;drawRing(usToDiameter(parseFloat(slider.value)));}}
+    function applyCal(){
+      const px=parseFloat(calibSlider.value);
+      const mm=25;
+      pxPerMM=px/mm;
+      calibBar.style.width=`${px}px`;
+      pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;
+      drawRing(usToDiameter(parseFloat(slider.value)));
+      saveCal();
+    }
 
-us.addEventListener("input",()=>updateAllFromUS(us.value));
-diameter.addEventListener("input",()=>{
-  const d=parseFloat(diameter.value);
-  if(isNaN(d))return;
-  const u=diameterToUs(d);
-  us.value=u.toFixed(1);
-  drawRing(d);
-});
+    slider.addEventListener('input',()=>updateFromUS(parseFloat(slider.value)));
+    calibSlider.addEventListener('input',applyCal);
+    resetBtn.addEventListener('click',()=>{
+      localStorage.removeItem('silsapx');
+      pxPerMM=6.8;
+      calibSlider.value=150;
+      applyCal();
+      alert('تمت إعادة المعايرة للوضع الافتراضي ✨');
+    });
 
-function applyCalibration(){
-  const px=parseFloat(calibSlider.value);
-  const cm=px/100; // العرض الظاهري
-  cmText.textContent=cm.toFixed(1)+" سم";
-  calibBar.style.width=px+"px";
-  pxPerMM=px/(cm*10); // التحويل بالملم داخليًا
-  const d=parseFloat(diameter.value)||18.1;
-  drawRing(d);
-}
-
-calibSlider.addEventListener("input",applyCalibration);
-applyCalibration();
-updateAllFromUS(7.5);
-</script>
+    loadCal();
+    updateFromUS(8);
+    applyCal();
+  </script>
 </body>
 </html>
