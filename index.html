@@ -55,7 +55,7 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
 </head>
 <body>
   <div class="wrap">
-    <h1 class="title">محاكاة مقاس الخاتم — SILSA 💍</h1>
+    <h1 class="title">محاكاة مقاس الخاتم — سلسا 💍</h1>
     <div class="subtitle">يتم ضبط حجم الخاتم تلقائيًا ليُعرض بالحجم الواقعي على شاشتك.</div>
 
     <div class="grid">
@@ -168,13 +168,51 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
       return dpr * 96;
     }
 
-    function autoCalibrate(){
-      const ppi = detectPPI();              // نقاط/بوصة
-      pxPerMM = ppi / 25.4;                 // بكسل لكل ملم
-      // أعِد الرسم بالقيمة الحالية للقطر (إن وُجد)
-      const d = tryNum(el.diameter.value) ?? usToDiameter(parseFloat(el.slider.value)||8);
-      drawRing(d);
+    <script>
+  // ⬇️ عوّض دالتك القديمة بهذه النسخة
+  function autoCalibrate() {
+    const probe = document.getElementById('mmProbe');
+    if (!probe) return;
+
+    // عرض 10mm كما يراها المتصفح بالبكسل
+    let pxFor10mm = probe.getBoundingClientRect().width;
+
+    // لو فيه تكبير في iOS Safari، صحّح القياس
+    const vv = window.visualViewport;
+    if (vv && vv.scale && vv.scale !== 1) {
+      pxFor10mm = pxFor10mm / vv.scale;
     }
+
+    // px لكل mm
+    let calcPxPerMM = pxFor10mm / 10;
+
+    // sanity clamp + fallback لو أعطى قيمة غير منطقية
+    if (!(calcPxPerMM > 2 && calcPxPerMM < 30)) {
+      const dpr = window.devicePixelRatio || 1;
+      calcPxPerMM = (dpr * 96) / 25.4; // احتياطي
+    }
+
+    // حدّث قيمة المعايرة العالمية وارسم الخاتم الحالي
+    pxPerMM = calcPxPerMM;
+
+    const currentD =
+      (Number(el.diameter?.value) || Number.NaN) && isFinite(Number(el.diameter.value))
+        ? Number(el.diameter.value)
+        : usToDiameter(parseFloat(el.slider?.value) || 8);
+
+    drawRing(currentD);
+  }
+
+  // ⬇️ أعد المعايرة عند تغيّر الحجم/الاتجاه (مع مهلة صغيرة لاستقرار القيم)
+  window.addEventListener('resize', () => setTimeout(autoCalibrate, 150));
+  window.addEventListener('orientationchange', () => setTimeout(autoCalibrate, 250));
+
+  // ⬇️ نادِها بعد ملء الصفحة لأول مرة
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(autoCalibrate, 50);
+  });
+</script>
+
 
     // رسم الخاتم فقط (يتأثر بالمعايرة)
     function drawRing(diameterMM){
@@ -227,5 +265,9 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
     updateAllFromUS(8);
     autoCalibrate();
   </script>
+  <!-- مسطرة خفية للمعايرة التلقائية: 10mm -->
+<div id="mmProbe" style="position:absolute;left:-9999px;top:-9999px;width:10mm;height:1px;pointer-events:none;visibility:hidden;"></div>
+
 </body>
 </html>
+
