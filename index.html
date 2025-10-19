@@ -167,8 +167,7 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
       // fallback محسّن: DPR * 96 (CSS inch)
       return dpr * 96;
     }
-
-    <script>
+    
   // ⬇️ عوّض دالتك القديمة بهذه النسخة
   function autoCalibrate() {
     const probe = document.getElementById('mmProbe');
@@ -211,7 +210,7 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(autoCalibrate, 50);
   });
-</script>
+
 
 
     // رسم الخاتم فقط (يتأثر بالمعايرة)
@@ -270,4 +269,5 @@ input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50
 
 </body>
 </html>
+
 
