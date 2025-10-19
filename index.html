@@ -1,238 +1,175 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💎 محاكاة مقاس الخاتم — SILSA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#ffeed3; --ink:#3e000c; --muted:#7e4a55;
-      --card:#fff7ea; --border:#f1d7b8;
-      --accent:#b8860b; --accent2:#d4af37;
-      --navy:#001f3f; --danger:#c81e1e;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,Arial}
-    .wrap{max-width:1100px;margin:24px auto;padding:16px}
-    .title{font-size:26px;font-weight:800;margin:0 0 6px}
-    .subtitle{color:var(--muted);margin:0 0 18px}
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    @media (max-width:880px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>💎 محاكاة مقاس الخاتم — SILSA</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffeed3; --ink:#3e000c;
+  --muted:#7e4a55; --accent:#b8860b; --accent2:#d4af37;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif}
+.wrap{max-width:1100px;margin:24px auto;padding:16px}
+.title{font-size:26px;font-weight:800;margin:0 0 6px}
+.subtitle{color:var(--muted);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+@media(max-width:880px){.grid{grid-template-columns:1fr}}
+.card{background:#fff7ea;border:1px solid #f1d7b8;border-radius:18px;padding:16px}
+label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
+input,select{width:100%;padding:10px 12px;border:1px solid #f1d7b8;border-radius:12px;font-size:16px;color:var(--ink)}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+.error{color:#c81e1e;font-weight:800;margin-top:8px;min-height:1.5em}
+.laser{color:#001f3f;font-weight:800;margin-top:8px;white-space:pre-line;min-height:2.6em}
+.canvas-card{display:flex;flex-direction:column;align-items:center;gap:10px}
+svg{max-width:380px;width:100%;height:auto;display:block}
+.size-label{font-weight:800}
 
-    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
-    input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:#fff;outline:none;color:var(--ink)}
-    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .full{grid-column:1/-1}
-    .error{color:var(--danger);font-weight:800;margin-top:8px;min-height:1.5em}
-    .laser{color:var(--navy);font-weight:800;margin-top:8px;white-space:pre-line;min-height:2.6em}
+/* خاتم ثلاثي الأبعاد */
+.ring-shadow{
+  fill:url(#ringFill);
+  stroke:url(#ringGrad);
+  stroke-width:12;
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.25)) drop-shadow(0 0 15px rgba(184,134,11,.15));
+}
+.ring-inner{stroke:#fff;stroke-width:4;fill:none}
+.ring-outline{stroke:var(--ink);stroke-width:3;fill:none}
 
-    /* الرسم */
-    .canvas-card{display:flex;flex-direction:column;align-items:center;gap:10px}
-    svg{max-width:380px;height:auto;display:block}
-    .size-label{font-weight:800}
-    .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill);filter:drop-shadow(0 6px 12px rgba(62,0,12,.12))}
-    .ring-stroke-inner{stroke:#fff;stroke-width:4;fill:none}
-    .ring-outline{stroke:var(--ink);stroke-width:3;fill:none;}
+/* السلايدر */
+.slider-wrap{display:flex;align-items:center;gap:10px;width:100%}
+input[type=range].size{appearance:none;width:100%;height:14px;border-radius:999px;background:#ead8bb;outline:none}
+input[type=range].size::-webkit-slider-thumb{appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
+input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
 
-    /* سلايدر المقاس */
-    .slider-wrap{display:flex;align-items:center;gap:10px;width:100%}
-    input[type=range].size{appearance:none;width:100%;height:14px;border-radius:999px;background:#ead8bb;outline:none}
-    input[type=range].size::-webkit-slider-thumb{appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
-    input[type=range].size::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
-
-    /* معايرة */
-    .calib{margin-top:14px}
-    .note{
-      background:var(--bg);
-      border:2px solid var(--accent2);
-      border-radius:12px;
-      padding:10px;
-      margin-bottom:10px;
-      font-size:14px;
-      line-height:1.7;
-      color:var(--ink);
-      text-align:center;
-    }
-    .bar{
-      height:40px;
-      background:linear-gradient(90deg,#fff,var(--accent2));
-      border:2px solid var(--accent2);
-      border-radius:20px;
-      width:250px;
-      margin:14px auto;
-      position:relative;
-      transition:width .2s ease;
-    }
-    .bar::before,.bar::after{
-      content:"";
-      position:absolute;
-      top:-10px;
-      width:3px;
-      height:60px;
-      background:var(--ink);
-    }
-    .bar::before{left:0}
-    .bar::after{right:0}
-    .hint{font-size:12px;color:var(--muted)}
-    .badge{
-      display:inline-block;background:rgba(212,175,55,.14);
-      color:var(--ink);border:1px solid var(--accent2);
-      padding:5px 9px;border-radius:999px;font-size:12px;
-    }
-    input[type=range].big{
-      appearance:none;width:100%;height:18px;border-radius:14px;background:linear-gradient(90deg,#fff,#e6caa0);outline:none;
-    }
-    input[type=range].big::-webkit-slider-thumb{
-      appearance:none;width:32px;height:32px;border-radius:50%;background:var(--accent2);
-      border:3px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.3);cursor:pointer;
-    }
-  </style>
+.hint{font-size:12px;color:var(--muted)}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1 class="title">محاكاة مقاس الخاتم—سِلّسَا💍</h1>
-    <div class="subtitle">اختاري المقاس وشاهدي الخاتم بالحجم الواقعي بعد المعايرة.</div>
+<div class="wrap">
+<h1 class="title">محاكاة مقاس الخاتم — SILSA 💍</h1>
+<p class="subtitle">يتم معايرة الخاتم تلقائيًا حسب حجم شاشتك ليظهر بالحجم الواقعي.</p>
 
-    <div class="grid">
-      <div class="card">
-        <div class="row">
-          <div>
-            <label>سماكة الفضة (mm)</label>
-            <select id="thickness">
-              <option>1.0</option><option>1.2</option><option>1.5</option><option>1.75</option><option>2.0</option>
-            </select>
-          </div>
-          <div style="align-self:end" class="hint">تؤثر على قيمة الليزر فقط</div>
-        </div>
-
-        <div class="row" style="margin-top:12px">
-          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal" placeholder="مثال: 7.5" /></div>
-          <div><label>المقاس البريطاني (UK)</label><input id="uk" placeholder="مثال: K½" /></div>
-          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal" placeholder="المحيط بالـ mm" /></div>
-          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal" placeholder="مثال: 19" /></div>
-          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal" placeholder="مثال: 18.1" /></div>
-          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal" placeholder="π × القطر" /></div>
-          <div class="full error" id="error"></div>
-          <div class="full laser" id="laser"></div>
-        </div>
-
-        <div class="card calib">
-          <div class="note">
-            ضعي المسطرة على الشاشة ثم حرّكي الشريط الذهبي حتى يطابق الطول بالسنتيمتر بين الخطّين.<br>
-            أقصى معايرة متاحة 5 سم فقط. التعديل يغيّر حجم الخاتم الظاهري فقط.
-          </div>
-          <div>
-            <label>مرجع المعايرة (سم)</label>
-            <input id="refCm" type="number" min="1" max="5" step="0.1" value="3">
-          </div>
-          <div id="calibBar" class="bar"></div>
-          <input id="calibSlider" type="range" min="100" max="500" step="1" value="300" class="big">
-          <div style="text-align:center;margin-top:8px">
-            <span class="badge" id="pxBadge">1 مم ≈ — بكسل</span>
-          </div>
-        </div>
+<div class="grid">
+  <!-- إدخالات -->
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>سماكة الفضة (mm)</label>
+        <select id="thickness">
+          <option>1.0</option><option>1.2</option><option>1.5</option><option>1.75</option><option>2.0</option>
+        </select>
       </div>
-
-      <div class="card canvas-card">
-        <div id="sizeLabel" class="size-label">المقاس الحالي: — (US)</div>
-        <svg id="ringSvg" viewBox="0 0 360 360">
-          <defs>
-            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#d9d9d9"/><stop offset="50%" stop-color="#f3f3f3"/><stop offset="100%" stop-color="#c6c6c6"/>
-            </linearGradient>
-            <radialGradient id="ringFill" cx="50%" cy="40%" r="65%">
-              <stop offset="0%" stop-color="#ffffff"/><stop offset="60%" stop-color="#f7f7f7"/><stop offset="100%" stop-color="#f0f0f0"/>
-            </radialGradient>
-          </defs>
-          <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
-          <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
-          <circle id="outline" class="ring-outline" cx="180" cy="190" r="66" />
-        </svg>
-        <div class="slider-wrap">
-          <span class="hint">4</span>
-          <input id="slider" type="range" min="4" max="14" step="0.5" value="8" class="size" />
-          <span class="hint">14</span>
-        </div>
-        <div class="hint">✨ غيّري أي خانة أو اسحبي الشريط — التحديث فوري</div>
-      </div>
+      <div style="align-self:end" class="hint">تؤثر على قيمة الليزر فقط</div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal" placeholder="مثال: 7.5"></div>
+      <div><label>المقاس البريطاني (UK)</label><input id="uk" placeholder="مثال: K½"></div>
+      <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal" placeholder="المحيط بالـ mm"></div>
+      <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal" placeholder="مثال: 19"></div>
+      <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal" placeholder="مثال: 18.1"></div>
+      <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal" placeholder="π × القطر"></div>
+      <div class="full error" id="error"></div>
+      <div class="full laser" id="laser"></div>
     </div>
   </div>
 
-  <script>
-    const PI=Math.PI,US_MIN=4,US_MAX=14;
-    const usToDiameter=us=>11.63+0.8128*us;
-    const diameterToUs=d=>(d-11.63)/0.8128;
-    const diameterToCirc=d=>PI*d;
-    const usToFR=us=>diameterToCirc(usToDiameter(us));
-    const usToJP=us=>us+12;
-    const UK_STEPS=["H","H½","I","I½","J","J½","K","K½","L","L½","M","M½","N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½","T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"];
-    const usToUK=us=>{const i=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);return UK_STEPS[Math.max(0,Math.min(UK_STEPS.length-1,Math.round(i)))]};
-    const normalizeUK=s=>s.trim().toUpperCase().replace("1/2","½");
-    const ukToUs=uk=>{const i=UK_STEPS.indexOf(normalizeUK(uk));if(i<0)return null;return US_MIN+(i/(UK_STEPS.length-1))*(US_MAX-US_MIN)};
+  <!-- الرسم -->
+  <div class="card canvas-card">
+    <div id="sizeLabel" class="size-label">المقاس الحالي: — (US)</div>
+    <svg id="ringSvg" viewBox="0 0 360 360">
+      <defs>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#c5c5c5"/><stop offset="50%" stop-color="#f3f3f3"/><stop offset="100%" stop-color="#999"/>
+        </linearGradient>
+        <radialGradient id="ringFill" cx="50%" cy="40%" r="65%">
+          <stop offset="0%" stop-color="#fff9f9"/><stop offset="60%" stop-color="#f2f2f2"/><stop offset="100%" stop-color="#dadada"/>
+        </radialGradient>
+      </defs>
+      <circle id="outer" class="ring-shadow" cx="180" cy="190" r="60" />
+      <circle id="inner" class="ring-inner" cx="180" cy="190" r="35" />
+      <circle id="outline" class="ring-outline" cx="180" cy="190" r="66" />
+    </svg>
+    <div class="slider-wrap">
+      <span class="hint">4</span>
+      <input id="slider" type="range" min="4" max="14" step="0.5" value="8" class="size">
+      <span class="hint">14</span>
+    </div>
+    <div class="hint">✨ يتم ضبط المقاس تلقائيًا حسب حجم شاشتك</div>
+  </div>
+</div>
+</div>
 
-    const $=id=>document.getElementById(id);
-    const el={
-      thickness:$("thickness"),us:$("us"),uk:$("uk"),fr:$("fr"),jp:$("jp"),diameter:$("diameter"),circ:$("circ"),
-      error:$("error"),laser:$("laser"),slider:$("slider"),sizeLabel:$("sizeLabel"),
-      outer:$("outer"),inner:$("inner"),outline:$("outline"),
-      refCm:$("refCm"),calibSlider:$("calibSlider"),calibBar:$("calibBar"),pxBadge:$("pxBadge")
-    };
+<script>
+const PI=Math.PI,US_MIN=4,US_MAX=14;
+const usToDiameter=us=>11.63+0.8128*us;
+const diameterToUs=d=>(d-11.63)/0.8128;
+const diameterToCirc=d=>PI*d;
+const usToFR=us=>diameterToCirc(usToDiameter(us));
+const usToJP=us=>us+12;
+const UK_STEPS=["H","H½","I","I½","J","J½","K","K½","L","L½","M","M½","N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½","T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"];
+const usToUK=us=>{const i=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);return UK_STEPS[Math.max(0,Math.min(UK_STEPS.length-1,Math.round(i)))]};
+const normalizeUK=s=>s.trim().toUpperCase().replace("1/2","½");
+const ukToUs=uk=>{const i=UK_STEPS.indexOf(normalizeUK(uk));if(i<0)return null;return US_MIN+(i/(UK_STEPS.length-1))*(US_MAX-US_MIN)};
+const $=id=>document.getElementById(id);
+const el={
+  thickness:$("thickness"),us:$("us"),uk:$("uk"),fr:$("fr"),jp:$("jp"),
+  diameter:$("diameter"),circ:$("circ"),error:$("error"),
+  laser:$("laser"),slider:$("slider"),sizeLabel:$("sizeLabel"),
+  outer:$("outer"),inner:$("inner"),outline:$("outline")
+};
 
-    let updating=false;
-    let pxPerMM=6.8;
-    const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
-    const tryNum=v=>{if(v==null)return null;v=(""+v).trim();if(!v||v==='.'||v==='-'||v==='-.')return null;const n=Number(v);return Number.isFinite(n)?n:null;};
-    function setError(msg){el.error.textContent=msg||"";if(msg)el.laser.textContent="";}
+let updating=false;
+let pxPerMM=6.8;
 
-    function drawRing(diameterMM){
-      const rPx=(diameterMM/2)*pxPerMM;
-      el.outer.setAttribute("r",rPx);
-      el.inner.setAttribute("r",rPx/1.7);
-      el.outline.setAttribute("r",rPx+6);
-    }
+// 🔹 المعايرة التلقائية حسب الشاشة
+function autoCalibrate(){
+  const dpi = window.devicePixelRatio * 96; // تقريبي
+  const mmPerInch = 25.4;
+  pxPerMM = dpi / mmPerInch; // بكسل لكل ملم
+}
+autoCalibrate();
 
-    function updateAllFromUS(us){
-      if(us<US_MIN||us>US_MAX){setError("❌ المقاس خارج النطاق (4 – 14)");return;}
-      setError("");
-      const d=usToDiameter(us),c=diameterToCirc(d);
-      const fr=c,jp=usToJP(us),uk=usToUK(us);
-      updating=true;
-      el.us.value=fmt(us,2);el.uk.value=uk;el.fr.value=fmt(fr,1);el.jp.value=fmt(jp,1);el.diameter.value=fmt(d,2);el.circ.value=fmt(c,1);el.slider.value=us;
-      updating=false;
-      el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
-      drawRing(d);
-      const t=parseFloat(el.thickness.value||"1");
-      el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;
-    }
+const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
+const tryNum=v=>{if(v==null)return null;v=(""+v).trim();if(!v||v==='.'||v==='-'||v==='-.')return null;const n=Number(v);return Number.isFinite(n)?n:null;};
+function setError(msg){el.error.textContent=msg||"";if(msg)el.laser.textContent="";}
 
-    function applyCalibration(){
-      const refCm=Math.min(Math.max(parseFloat(el.refCm.value)||3,1),5);
-      const barPx=Math.min(Math.max(parseFloat(el.calibSlider.value)||300,100),500);
-      el.refCm.value=refCm;
-      el.calibBar.style.width=`${barPx}px`;
-      pxPerMM=barPx/(refCm*10);
-      el.pxBadge.textContent=`1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;
-      const d=tryNum(el.diameter.value);
-      if(d!=null) drawRing(d);
-    }
+function drawRing(diameterMM){
+  const rPx=(diameterMM/2)*pxPerMM;
+  el.outer.setAttribute("r",rPx);
+  el.inner.setAttribute("r",rPx/1.7);
+  el.outline.setAttribute("r",rPx+6);
+}
 
-    el.calibSlider.addEventListener("input",applyCalibration);
-    el.refCm.addEventListener("input",applyCalibration);
-    el.us.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.us.value);if(n==null)return;updateAllFromUS(n);});
-    el.uk.addEventListener("input",()=>{if(updating)return;const us=ukToUs(el.uk.value);if(us==null)return;updateAllFromUS(us);});
-    el.fr.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.fr.value);if(n==null)return;updateAllFromUS(diameterToUs(n/PI));});
-    el.jp.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.jp.value);if(n==null)return;updateAllFromUS(n-12);});
-    el.diameter.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.diameter.value);if(n==null)return;updateAllFromUS(diameterToUs(n));});
-    el.circ.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.circ.value);if(n==null)return;updateAllFromUS(diameterToUs(n/PI));});
-    el.slider.addEventListener("input",()=>{if(updating)return;updateAllFromUS(parseFloat(el.slider.value));});
-    el.thickness.addEventListener("change",()=>{const d=tryNum(el.diameter.value);if(d==null){el.laser.textContent="";return;}const t=parseFloat(el.thickness.value)||1;el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;});
+function updateAllFromUS(us){
+  if(us<US_MIN||us>US_MAX){setError("❌ المقاس خارج النطاق (4 – 14)");return;}
+  setError("");
+  const d=usToDiameter(us),c=diameterToCirc(d);
+  const fr=c,jp=usToJP(us),uk=usToUK(us);
+  updating=true;
+  el.us.value=fmt(us,2);el.uk.value=uk;el.fr.value=fmt(fr,1);el.jp.value=fmt(jp,1);
+  el.diameter.value=fmt(d,2);el.circ.value=fmt(c,1);el.slider.value=us;
+  updating=false;
+  el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
+  drawRing(d);
+  const t=parseFloat(el.thickness.value||"1");
+  el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;
+}
 
-    updateAllFromUS(8);
-    applyCalibration();
-  </script>
+el.us.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.us.value);if(n==null)return;updateAllFromUS(n);});
+el.uk.addEventListener("input",()=>{if(updating)return;const us=ukToUs(el.uk.value);if(us==null)return;updateAllFromUS(us);});
+el.fr.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.fr.value);if(n==null)return;updateAllFromUS(diameterToUs(n/PI));});
+el.jp.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.jp.value);if(n==null)return;updateAllFromUS(n-12);});
+el.diameter.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.diameter.value);if(n==null)return;updateAllFromUS(diameterToUs(n));});
+el.circ.addEventListener("input",()=>{if(updating)return;const n=tryNum(el.circ.value);if(n==null)return;updateAllFromUS(diameterToUs(n/PI));});
+el.slider.addEventListener("input",()=>{if(updating)return;updateAllFromUS(parseFloat(el.slider.value));});
+el.thickness.addEventListener("change",()=>{const d=tryNum(el.diameter.value);if(d==null){el.laser.textContent="";return;}const t=parseFloat(el.thickness.value)||1;el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt((d+t)*PI,1)} mm\n(سماكة الفضة: ${fmt(t,2)} mm)`;});
+
+updateAllFromUS(8);
+drawRing(usToDiameter(8));
+</script>
 </body>
 </html>
-
