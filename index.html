@@ -1,142 +1,123 @@
-<!-- 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دائرة تتحكم بها بالشريط</title>
+  <title>معايرة مقاس الخاتم الواقعي</title>
   <style>
     body {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: #fafafa;
       font-family: sans-serif;
+      background: #fafafa;
+      height: 100vh;
+      justify-content: center;
+      text-align: center;
     }
 
-    .size-label {
-      font-size: 20px;
-      color: #44080f;
-      margin-bottom: 10px;
-      font-weight: bold;
+    .card {
+      background: #ddd;
+      border: 2px dashed #44080f;
+      margin-bottom: 15px;
+      transition: width 0.2s ease, height 0.2s ease;
     }
 
     .circle {
-      width: 100px;
-      height: 100px;
-      background: #44080f;
       border-radius: 50%;
-      transition: all 0.2s ease;
-      margin-bottom: 40px;
+      background: #44080f;
+      margin: 20px 0;
+      transition: width 0.3s ease, height 0.3s ease;
     }
 
     input[type="range"] {
       width: 300px;
+      margin: 10px 0;
       accent-color: #44080f;
-      cursor: pointer;
+    }
+
+    .label {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #44080f;
+      font-weight: bold;
+    }
+
+    .divider {
+      height: 1px;
+      background: #ccc;
+      width: 100%;
+      margin: 30px 0;
     }
   </style>
 </head>
 <body>
 
-  <div class="size-label" id="sizeLabel">الحجم: 100px</div>
+  <h2>🔧 خطوة 1: عاير الشاشة</h2>
+  <p>قرب بطاقة حقيقية (هوية أو بنك) واضبط العرض حتى يتطابق تماماً.</p>
+
+  <div class="card" id="card"></div>
+  <input type="range" id="calibrate" min="100" max="400" value="200">
+  <div class="label" id="calLabel">العرض الحالي: 200px</div>
+
+  <div class="divider"></div>
+
+  <h2>💍 خطوة 2: اختر مقاس الخاتم</h2>
+  <div class="label" id="ringLabel">المقاس: 6 (16.5 مم)</div>
   <div class="circle" id="circle"></div>
-  <input type="range" id="slider" min="50" max="300" value="100">
+  <input type="range" id="ringSlider" min="5" max="13" step="0.5" value="6">
 
   <script>
+    const card = document.getElementById('card');
+    const calSlider = document.getElementById('calibrate');
+    const calLabel = document.getElementById('calLabel');
+    const ringLabel = document.getElementById('ringLabel');
     const circle = document.getElementById('circle');
-    const slider = document.getElementById('slider');
-    const sizeLabel = document.getElementById('sizeLabel');
+    const ringSlider = document.getElementById('ringSlider');
 
-    slider.addEventListener('input', () => {
-      const size = slider.value;
-      circle.style.width = size + 'px';
-      circle.style.height = size + 'px';
-      sizeLabel.textContent = 'الحجم: ' + size + 'px';
-    });
-  </script>
+    // المقاسات الحقيقية للبطاقة بالمليمتر
+    const CARD_WIDTH_MM = 85.6;
+    const CARD_HEIGHT_MM = 53.98;
 
-</body>
-</html> -->
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محاكاة مقاس الخاتم</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #fafafa;
-      font-family: sans-serif;
-    }
-
-    .size-label {
-      font-size: 22px;
-      color: #44080f;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    .circle {
-      background: #44080f;
-      border-radius: 50%;
-      margin-bottom: 40px;
-      transition: all 0.3s ease;
-    }
-
-    input[type="range"] {
-      width: 300px;
-      accent-color: #44080f;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="size-label" id="sizeLabel">المقاس: 6 (16.5 مم)</div>
-  <div class="circle" id="circle"></div>
-  <input type="range" id="slider" min="5" max="13" step="0.5" value="6">
-
-  <script>
-    const circle = document.getElementById('circle');
-    const slider = document.getElementById('slider');
-    const sizeLabel = document.getElementById('sizeLabel');
-
-    // جدول تحويل المقاس إلى القطر بالمليمتر
+    // مقاسات الخواتم الأمريكية بالمليمتر
     const ringSizes = {
-      5: 15.7,
-      6: 16.5,
-      7: 17.3,
-      8: 18.1,
-      9: 18.9,
-      10: 19.8,
-      11: 20.6,
-      12: 21.4,
-      13: 22.2
+      5: 15.7, 6: 16.5, 7: 17.3, 8: 18.1, 9: 18.9, 10: 19.8, 11: 20.6, 12: 21.4, 13: 22.2
     };
 
-    function updateCircle(size) {
-      const diameterMM = ringSizes[size] || 16.5;
-      const pxPerMM = 3.78; // تقريباً 1مم = 3.78px (حسب دقة الشاشة)
+    let pxPerMM = 3.78; // افتراضي
+
+    // تحديث مستطيل المعايرة
+    calSlider.addEventListener('input', () => {
+      const pxWidth = parseInt(calSlider.value);
+      const ratio = CARD_HEIGHT_MM / CARD_WIDTH_MM;
+      const pxHeight = pxWidth * ratio;
+
+      card.style.width = pxWidth + 'px';
+      card.style.height = pxHeight + 'px';
+      calLabel.textContent = `العرض الحالي: ${pxWidth}px`;
+
+      pxPerMM = pxWidth / CARD_WIDTH_MM; // كم بكسل لكل مم
+      updateRing();
+    });
+
+    // تحديث الدائرة حسب المقاس
+    function updateRing() {
+      const size = ringSlider.value;
+      const diameterMM = ringSizes[size];
       const diameterPX = diameterMM * pxPerMM;
 
       circle.style.width = diameterPX + 'px';
       circle.style.height = diameterPX + 'px';
-      sizeLabel.textContent = `المقاس: ${size} (${diameterMM} مم)`;
+      ringLabel.textContent = `المقاس: ${size} (${diameterMM} مم)`;
     }
 
-    updateCircle(slider.value);
+    ringSlider.addEventListener('input', updateRing);
 
-    slider.addEventListener('input', () => {
-      updateCircle(slider.value);
-    });
+    // ضبط القيم الأولية
+    const ratio = CARD_HEIGHT_MM / CARD_WIDTH_MM;
+    card.style.width = '200px';
+    card.style.height = (200 * ratio) + 'px';
+    updateRing();
   </script>
 
 </body>
