@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>معايرة مقاس الخاتم الواقعي</title>
   <style>
     body {
@@ -53,8 +53,8 @@
 </head>
 <body>
 
-  <h2>🔧 خطوة 1: عاير الشاشة</h2>
-  <p>ضع البطاقة الحقيقية (الهوية أو البنك) عموديًا على الشاشة واضبط الطول حتى يتطابق تمامًا.</p>
+  <h2>🔧خطوة 1: عاير الان الشاشة</h2>
+  <p>ضع البطاقة الحقيقية عموديًا واضبط الطول باستخدام السلايدر.</p>
 
   <div class="card" id="card"></div>
   <input type="range" id="calibrate" min="100" max="500" value="200">
@@ -75,33 +75,34 @@
     const circle = document.getElementById('circle');
     const ringSlider = document.getElementById('ringSlider');
 
-    // المقاسات الحقيقية للبطاقة (بالملم)
-    const CARD_WIDTH_MM = 85.6;
-    const CARD_HEIGHT_MM = 53.98;
+    // أبعاد البطاقة الحقيقية بالملم
+    const CARD_WIDTH_MM = 53.98;
+    const CARD_HEIGHT_MM = 85.6;
 
-    // مقاسات الخواتم الأمريكية بالملم
+    // مقاسات الخواتم بالملم
     const ringSizes = {
       5: 15.7, 6: 16.5, 7: 17.3, 8: 18.1, 9: 18.9, 10: 19.8, 11: 20.6, 12: 21.4, 13: 22.2
     };
 
     let pxPerMM = 3.78; // افتراضي
 
-    // تحديث مستطيل المعايرة (الآن بالطول)
-    calSlider.addEventListener('input', () => {
+    // تحديث مستطيل المعايرة
+    function updateCard() {
       const pxHeight = parseInt(calSlider.value);
-      const ratio = CARD_WIDTH_MM / CARD_HEIGHT_MM;
+      const ratio = CARD_WIDTH_MM / CARD_HEIGHT_MM; // العرض / الطول
       const pxWidth = pxHeight * ratio;
 
-      card.style.height = pxHeight + 'px';
-      card.style.width = pxWidth + 'px';
+      card.style.height = pxHeight + 'px'; // الطول يتحكم فيه السلايدر
+      card.style.width = pxWidth + 'px';   // العرض يحسب بالنسبة الصحيحة
       calLabel.textContent = `الطول الحالي: ${pxHeight}px`;
 
-      // حساب كم بكسل لكل ملم
-      pxPerMM = pxHeight / CARD_HEIGHT_MM;
+      pxPerMM = pxHeight / CARD_HEIGHT_MM; // 1 ملم = كم بكسل
       updateRing();
-    });
+    }
 
-    // تحديث الدائرة حسب المقاس
+    calSlider.addEventListener('input', updateCard);
+
+    // تحديث الدائرة حسب مقاس الخاتم
     function updateRing() {
       const size = ringSlider.value;
       const diameterMM = ringSizes[size];
@@ -114,11 +115,9 @@
 
     ringSlider.addEventListener('input', updateRing);
 
-    // القيم الأولية
-    const ratio = CARD_WIDTH_MM / CARD_HEIGHT_MM;
-    card.style.height = '200px';
-    card.style.width = (200 * ratio) + 'px';
-    updateRing();
+    // ضبط القيم الأولية
+    calSlider.value = 200;
+    updateCard();
   </script>
 
 </body>
