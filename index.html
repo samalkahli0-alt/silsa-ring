@@ -287,23 +287,32 @@
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
     let pxPerMM     = scaleFactor; // تُستخدم في رسم الخاتم
 
-   function updateCardBoxFromSlider(){
-  const wPx = parseFloat(calibSlider.value);
-  const hPx = wPx * CARD_RATIO;
+ function updateCardBoxFromSlider(){
+  const wPx = parseFloat(calibSlider.value);    // عرض البطاقة كامل
+  const hPx = wPx * CARD_RATIO;                 // ارتفاع البطاقة الحقيقي بنسبة وتناسب
 
   // حجم البطاقة
   cardBox.style.width  = wPx + "px";
   cardBox.style.height = hPx + "px";
 
-  // نصف البطاقة داخل — نصفها خارج
-  cardBox.style.right = -(wPx / 2) + "px";
+  // نصف البطاقة داخل الشاشة — نصفها خارج
+  const half = wPx / 2;
+  cardBox.style.right = -half + "px";
   cardBox.style.top   = "50%";
   cardBox.style.transform = "translateY(-50%)";
 
-  // 🔥 أهم تعديل:
-  // نخلي ارتفاع منطقة الحافة (viewport) = ارتفاع البطاقة
-  cardViewport.style.height = hPx + "px";
+  // 🔥 نصف عرض البطاقة ظاهر فقط
+  // نخلي مساحة الكنتينر = نصف عرض البطاقة + هوامش بسيطة
+  cardViewport.style.width  = half + "px";
+  cardViewport.style.height = hPx   + "px";
+
+  // 🔥 كلمة (ضع البطاقة ←) تكون على يمين البطاقة بالضبط
+  edgeHint.style.position = "absolute";
+  edgeHint.style.right = (half + 12) + "px";  // بجانب البطاقة
+  edgeHint.style.top   = "50%";
+  edgeHint.style.transform = "translateY(-50%)";
 }
+
 
 
     startCalib.addEventListener("click", ()=>{
@@ -472,4 +481,5 @@
   </script>
 </body>
 </html>
+
 
