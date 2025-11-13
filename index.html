@@ -144,31 +144,33 @@
       margin:0 auto;
     }
 
-    #edgeHint{
-      text-align:right;
-      margin:0 4px 10px;
-      font-size:14px;
-      color:#fff;
-    }
-
-    /* منطقة عرض البطاقة (نصها داخل ونصها خارج) */
-    #cardViewport{
-      position:relative;
-      width:80vw;
-      max-width:420px;
-      height:150px;
-      margin:0 0 16px auto; /* تسحبه لليمين */
-      overflow:hidden;
+    #calibrationRow{
+      margin:20px 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
     }
 
     #cardBox{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
       background:white;
       border:4px solid #3e000c;  /* إطار عنابي */
       border-radius:10px;
       box-shadow:0 0 12px rgba(0,0,0,.35);
+    }
+
+    #hintBox{
+      display:flex;
+      flex-direction:row;
+      align-items:center;
+      gap:6px;
+      font-size:15px;
+      white-space:nowrap;
+    }
+
+    #hintBox .arrow{
+      font-size:20px;
+      line-height:1;
     }
 
     #calibSlider{
@@ -198,9 +200,10 @@
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
         <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>2)</b> ضع البطاقة بشكل عرضي على طرف الشاشة (نصفها على الشاشة ونصفها خارجها).<br>
-        <b>3)</b> حرّك السلايدر حتى يتطابق الجزء الظاهر من البطاقة مع المستطيل الأبيض تماماً.<br>
-        <b>4)</b> اضغط حفظ وإغلاق.<br><br>
+        <b>2)</b> ضع البطاقة بشكل عرضي على شاشة الجوال، بحيث نصفها فوق الشاشة ونصفها خارجها.<br>
+        <b>3)</b> ضع نصف البطاقة فوق المستطيل الأبيض، وحاول تطابقه تمامًا (نفس نصف البطاقة).<br>
+        <b>4)</b> حرّك السلايدر حتى يصبح المستطيل نفس نصف البطاقة بالحجم الحقيقي.<br>
+        <b>5)</b> اضغط حفظ وإغلاق.<br><br>
         بعدها يظهر الخاتم بالحجم الحقيقي 🙌💛
       </div>
       <button id="startCalib">بدء المعايرة</button>
@@ -251,12 +254,17 @@
   <div id="calibrationScreen">
     <div id="calibrationInner">
       <h2>🔧 المعايرة</h2>
-      <p>ضع البطاقة بشكل عرضي بحيث يظهر نصفها على الشاشة، ثم حرّك السلايدر حتى يتطابق عرض الجزء الظاهر مع المستطيل.</p>
+      <p>ضع نصف البطاقة فوق المستطيل، ثم حرّك السلايدر حتى يطابق نصف البطاقة بالحجم.</p>
 
-      <div id="edgeHint">← ضع حافة البطاقة هنا</div>
-
-      <div id="cardViewport">
+      <div id="calibrationRow">
+        <!-- المربع الذي يمثل نصف البطاقة -->
         <div id="cardBox"></div>
+
+        <!-- النص مع السهم بجانب المربع -->
+        <div id="hintBox">
+          <span>ضع البطاقة هنا</span>
+          <span class="arrow">←</span>
+        </div>
       </div>
 
       <input type="range" id="calibSlider">
@@ -270,58 +278,44 @@
   </div>
 
   <script>
-    /************* معايرة البطاقة (العرض الحقيقي) *************/
+    /************* معايرة البطاقة (نصف البطاقة بالعرض) *************/
     const calibScreen   = document.getElementById("calibrationScreen");
     const calibSlider   = document.getElementById("calibSlider");
     const cardBox       = document.getElementById("cardBox");
-    const cardViewport  = document.getElementById("cardViewport");
     const startCalib    = document.getElementById("startCalib");
     const doneCalib     = document.getElementById("doneCalib");
     const calibStatus   = document.getElementById("calibStatus");
 
-    // عرض البطاقة الحقيقي (mm) – نستخدمه في المعايرة
-    const CARD_WIDTH_MM  = 53.98;  // العرض
-    const CARD_HEIGHT_MM = 85.6;   // الطول
-    const CARD_RATIO     = CARD_HEIGHT_MM / CARD_WIDTH_MM; // الطول/العرض
+    // أبعاد البطاقة الحقيقية (بطاقة بنك / هوية) أفقية:
+    // العرض (الطول الأفقي) = 85.6mm
+    // الارتفاع (الضلع القصير) = 53.98mm
+    const CARD_LONG_MM  = 85.6;     // الضلع الطويل
+    const CARD_SHORT_MM = 53.98;    // الضلع القصير (ارتفاع البطاقة)
+    const HALF_LONG_MM  = CARD_LONG_MM / 2;  // نصف البطاقة (اللي نعايره)
 
+    // scaleFactor = كم بكسل لكل 1mm
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
     let pxPerMM     = scaleFactor; // تُستخدم في رسم الخاتم
 
- function updateCardBoxFromSlider(){
-  const wPx = parseFloat(calibSlider.value);    // عرض البطاقة كامل
-  const hPx = wPx * CARD_RATIO;                 // ارتفاع البطاقة الحقيقي بنسبة وتناسب
+    // تحديث شكل مستطيل المعايرة (يمثل نصف البطاقة بالحجم الحقيقي)
+    function updateCardBoxFromSlider(){
+      const halfWidthPx = parseFloat(calibSlider.value); // عرض نصف البطاقة على الشاشة بالبكسل
 
-  // حجم البطاقة
-  cardBox.style.width  = wPx + "px";
-  cardBox.style.height = hPx + "px";
+      // نستخدم scale مؤقت لحساب الارتفاع بنفس النسبة الحقيقية
+      const tempScale   = halfWidthPx / HALF_LONG_MM; // بكسل لكل 1mm (نصف البطاقة)
+      const heightPx    = CARD_SHORT_MM * tempScale;  // ارتفاع البطاقة بالبكسل
 
-  // نصف البطاقة داخل الشاشة — نصفها خارج
-  const half = wPx / 2;
-  cardBox.style.right = -half + "px";
-  cardBox.style.top   = "50%";
-  cardBox.style.transform = "translateY(-50%)";
-
-  // 🔥 نصف عرض البطاقة ظاهر فقط
-  // نخلي مساحة الكنتينر = نصف عرض البطاقة + هوامش بسيطة
-  cardViewport.style.width  = half + "px";
-  cardViewport.style.height = hPx   + "px";
-
-  // 🔥 كلمة (ضع البطاقة ←) تكون على يمين البطاقة بالضبط
-  edgeHint.style.position = "absolute";
-  edgeHint.style.right = (half + 12) + "px";  // بجانب البطاقة
-  edgeHint.style.top   = "50%";
-  edgeHint.style.transform = "translateY(-50%)";
-}
-
-
+      cardBox.style.width  = halfWidthPx + "px";  // يمثل نصف عرض البطاقة
+      cardBox.style.height = heightPx    + "px";  // يمثل ارتفاع البطاقة الحقيقي بنسبة وتناسب
+    }
 
     startCalib.addEventListener("click", ()=>{
-      // مدى السلايدر: يكفي لتغطية الأحجام المتوقعة للبطاقة
-      const maxPx = Math.round(window.innerWidth * 2);
+      // نخلي مدى السلايدر يناسب أغلب الأجهزة
+      const maxHalfWidthPx = Math.round(window.innerWidth * 0.9);
 
-      calibSlider.min   = 80;
-      calibSlider.max   = maxPx;
-      calibSlider.value = 140; // بداية متوسطة
+      calibSlider.min   = 40;   // صغير مبدئياً
+      calibSlider.max   = maxHalfWidthPx;
+      calibSlider.value = Math.round(maxHalfWidthPx * 0.5); // قيمة متوسطة
 
       updateCardBoxFromSlider();
       calibScreen.style.display = "block";
@@ -330,11 +324,14 @@
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
     doneCalib.addEventListener("click", ()=>{
-      const px = parseFloat(calibSlider.value);
+      const halfWidthPx = parseFloat(calibSlider.value);
 
-      // الآن scaleFactor = كم بكسل لكل 1mm من عرض البطاقة
-      scaleFactor = px / CARD_WIDTH_MM;
+      // الآن نحسب scaleFactor الحقيقي بناءً على نصف البطاقة:
+      // نصف البطاقة الحقيقي = HALF_LONG_MM mm
+      // نصف البطاقة على الشاشة = halfWidthPx px
+      scaleFactor = halfWidthPx / HALF_LONG_MM; // px لكل 1mm
       pxPerMM     = scaleFactor;
+
       localStorage.setItem("scaleFactor", scaleFactor);
 
       calibStatus.textContent = "✔ تمت المعايرة بنجاح";
@@ -342,7 +339,7 @@
 
       calibScreen.style.display = "none";
 
-      // بعد تحديث pxPerMM نعيد رسم الخاتم على المقاس الحالي
+      // نعيد رسم الخاتم على المقاس الحالي بعد تحديث pxPerMM
       const currentUS = parseFloat(document.getElementById("us").value) || 8;
       updateAllFromUS(currentUS);
     });
@@ -481,5 +478,3 @@
   </script>
 </body>
 </html>
-
-
