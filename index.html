@@ -18,106 +18,81 @@
       --border:#f1d7b8;
       --accent:#b8860b;
       --accent-2:#d4af37;
-      --diamond-1:#89CFF0;
-      --diamond-2:#bde3fb;
       --danger:#c81e1e;
       --navy:#001f3f;
     }
 
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,Arial}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal'}
 
     .wrap{max-width:1100px;margin:24px auto;padding:16px}
-    .title{font-size:26px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
-    .subtitle{color:var(--muted);margin-bottom:18px}
+    .title{font-size:28px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
+    .subtitle{color:var(--muted);margin-bottom:18px;font-size:17px}
 
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    @media (max-width:880px){.grid{grid-template-columns:1fr;}}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:18px;
+      margin-bottom:18px;
+    }
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
-
-    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
+    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px;}
     input,select{
       width:100%;padding:10px 12px;border:1px solid var(--border);
-      border-radius:12px;font-size:16px;background:#fff;
-      outline:none;color:var(--ink)
+      border-radius:12px;font-size:16px;background:white;color:var(--ink)
     }
+
     input:focus,select:focus{
-      border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,175,55,.18)
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(212,175,55,.2)
     }
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .full{grid-column:1/-1}
-
-    .error{color:var(--danger);font-weight:800;margin-top:8px;min-height:1.5em}
-    .laser{color:var(--navy);font-weight:800;margin-top:8px;white-space:pre-line;min-height:2.6em}
-
-    .canvas-card{display:flex;flex-direction:column;align-items:center;gap:10px}
-    svg{max-width:380px;height:auto;display:block}
-
-    /* 🔥 إطار الدائرة */
-    .ring-border{
-      stroke:#b8860b;
-      stroke-width:4;
-      fill:none;
-      opacity:.7;
-    }
-
-    .size-label{font-weight:800;color:var(--ink)}
-
-    .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill);filter:drop-shadow(0 6px 12px rgba(62,0,12,.12))}
-    .ring-stroke-inner{stroke:url(#innerGrad);stroke-width:4;fill:#fff}
-
-    .diamond{filter:drop-shadow(0 3px 6px rgba(0,0,0,.15))}
-
-    .slider-wrap{display:flex;align-items:center;gap:10px;width:100%}
-    input[type=range]{
-      appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;outline:none
-    }
-    input[type=range]::-webkit-slider-thumb{
-      appearance:none;width:18px;height:18px;border-radius:50%;
-      background:var(--accent-2);border:2px solid #fff;
-      box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer
-    }
-
-    @keyframes sparkle{
-      0%{fill:var(--diamond-1)}
-      50%{fill:var(--diamond-2)}
-      100%{fill:var(--diamond-1)}
-    }
-    .sparkle{animation:sparkle 1.2s ease-in-out infinite}
-
-    .hint{font-size:12px;color:var(--muted)}
-
-    /* 🔥 شاشة المعايرة */
+    /* شاشة المعايرة */
     #calibrationScreen{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.75);
-      backdrop-filter:blur(4px);
-      z-index:9999;
-      color:white;
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+      backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999;
 
-      /* ↓↓↓ التعديل الجديد ↓↓↓ */
+      /* يجعلها بالنص دائماً */
       display:flex;
       flex-direction:column;
       justify-content:center;
       align-items:center;
       gap:20px;
-      overflow:hidden;
-      text-align:center;
-      padding:20px;
     }
 
-    /* 🔥 مربع البطاقة + إطار سيلسا العنابي */
+    /* ⭐ مربع البطاقة + إطار عنابي */
     #cardBox{
-      background:white;
       width:60px;
-      height:120px;
-      border:5px solid #3e000c;
-      border-radius:12px;
+      height:160px;
+      background:white;
+      margin:20px auto;
+
+      border-radius:10px;
+      border:4px solid #3e000c; /* 🔥 الإطار العنابي */
+    }
+
+    input[type=range]{
+      appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;
+    }
+
+    input[type=range]::-webkit-slider-thumb{
+      appearance:none;width:20px;height:20px;border-radius:50%;
+      background:var(--accent-2);border:2px solid white;
+    }
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+    svg{max-width:380px;height:auto;margin:auto;display:block}
+    .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill)}
+    .ring-stroke-inner{stroke:url(#innerGrad);stroke-width:4;fill:#fff}
+
+    .diamond{animation:sparkle 1.3s infinite}
+    @keyframes sparkle{
+      0%{fill:#89CFF0}
+      50%{fill:#bde3fb}
+      100%{fill:#89CFF0}
     }
   </style>
 </head>
@@ -126,42 +101,69 @@
   <div class="wrap">
 
     <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
-    <div class="subtitle">اضبطي المقاس بدقة، وكل شيء يحدث تلقائيًا ✨</div>
 
+    <div class="card">
+      <h3>📘 طريقة الاستخدام</h3>
+      <div style="background:white;padding:14px;border-radius:12px;border:1px solid var(--border);font-size:15px;line-height:1.7">
+        <b>1)</b> اختر نوع الشركة.<br>
+        <b>2)</b> اختر موديل جهازك.<br>
+        <b>3)</b> اضغط "بدء المعايرة".<br>
+        <b>4)</b> ضع بطاقة البنك بشكل طولي على الشاشة.<br>
+        <b>5)</b> كبّر/صغّر الصندوق حتى يكون نفس طول البطاقة 100%.<br>
+        <b>6)</b> احفظ المعايرة.<br>
+        بعدها ستظهر الدائرة بالحجم الحقيقي للمقاس 💛
+      </div>
+    </div>
+
+    <!-- اختيار الجهاز -->
+    <div class="card">
+      <h3>🔧 اختيار جهازك</h3>
+
+      <label>الشركة</label>
+      <select id="brandSelect">
+        <option value="">— اختر الشركة —</option>
+      </select>
+
+      <label style="margin-top:12px">الموديل</label>
+      <select id="modelSelect" disabled>
+        <option value="">— اختر الموديل —</option>
+      </select>
+
+      <button id="startCalib"
+        style="margin-top:14px;padding:12px;border-radius:12px;background:var(--accent);color:white;border:none;font-size:17px;width:100%">
+        بدء المعايرة
+      </button>
+
+      <div id="calibStatus" style="color:var(--muted);margin-top:10px">لم تتم المعايرة بعد</div>
+    </div>
+
+    <!-- المحتوى -->
     <div class="grid">
 
-      <!-- الإدخالات -->
       <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
-        <label style="font-weight:700;margin-bottom:12px">معايرة الشاشة</label>
+          <div><label>US</label><input id="us" inputmode="decimal" /></div>
+          <div><label>UK</label><input id="uk"/></div>
+          <div><label>FR</label><input id="fr" inputmode="decimal"/></div>
+          <div><label>JP</label><input id="jp" inputmode="decimal"/></div>
+          <div><label>القطر (mm)</label><input id="diameter" inputmode="decimal"/></div>
+          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
 
-        <button id="startCalib"
-          style="padding:12px;border-radius:10px;background:var(--accent);color:white;border:none;font-size:16px;width:100%;margin-bottom:15px">
-          بدء المعايرة
-        </button>
-
-        <label>الشركة</label>
-        <select id="brandSelect">
-          <option value="">اختر الشركة</option>
-        </select>
-
-        <label style="margin-top:12px">الموديل</label>
-        <select id="modelSelect" disabled>
-          <option value="">اختر الموديل</option>
-        </select>
-
-        <div id="calibStatus" class="hint" style="margin-top:12px">لم تتم المعايرة بعد</div>
-
+          <div id="error" style="color:#c81e1e;font-weight:700"></div>
+          <div id="laser" style="color:#001f3f;font-weight:700"></div>
+        </div>
       </div>
 
-      <!-- الرسم -->
-      <div class="card canvas-card">
-        <div id="sizeLabel" class="size-label">المقاس الحالي: — (US)</div>
+      <div class="card">
+        <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
+          المقاس الحالي: — (US)
+        </div>
 
         <svg id="ringSvg" viewBox="0 0 360 360">
 
-          <!-- 🔥 إطار الدائرة -->
-          <circle class="ring-border" cx="180" cy="190" r="95" />
+          <!-- ⭐ إطار الدائرة -->
+          <circle cx="180" cy="190" r="95" stroke="#3e000c" stroke-width="4" fill="none" opacity="0.7"/>
 
           <defs>
             <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -185,47 +187,39 @@
           <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
           <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
 
-          <polygon id="diamond" class="sparkle diamond"
+          <polygon id="diamond" class="diamond"
             points="180,90 170,100 180,110 190,100"
-            fill="#89CFF0" stroke="#5a9bd4" stroke-width="2" />
+            stroke="#5a9bd4" stroke-width="2" fill="#89CFF0" />
         </svg>
 
-        <div class="slider-wrap">
-          <span class="hint">4</span>
-          <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
-          <span class="hint">14</span>
-        </div>
-
-        <div class="hint">اسحبي الشريط أو عدّلي أي خانة بالأعلى</div>
+        <input id="slider" type="range" min="4" max="14" step="0.5" value="8" style="margin-top:15px;width:100%">
       </div>
-
     </div>
   </div>
 
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>ضع بطاقة البنك بشكل طولي ثم حرّك الشريط حتى يطابق الصندوق طول البطاقة.</p>
+    <p>ضع بطاقة البنك بشكل طولي وكبّر الصندوق حتى يطابق طول البطاقة تماماً.</p>
 
     <div id="cardBox"></div>
 
-    <input id="calibSlider" type="range" style="width:80%;max-width:350px">
+    <input type="range" id="calibSlider" min="80" max="350" value="160" style="width:80%;max-width:380px">
 
     <button id="doneCalib"
-      style="padding:12px;border-radius:10px;background:var(--accent);color:white;border:none;font-size:17px;width:80%;max-width:330px">
+      style="margin-top:20px;padding:12px;border-radius:12px;background:var(--accent);color:white;border:none;font-size:17px;width:80%;max-width:380px">
       حفظ وإغلاق
     </button>
   </div>
 
 <script>
-/* =================  تحميل الأجهزة  =================== */
+/* ================= تحميل devices.json ================= */
 fetch("data/devices.json")
-.then(res => res.json())
-.then(devices => initDeviceSelector(devices));
+  .then(res => res.json())
+  .then(devices => initDeviceSelector(devices));
 
 const brandSelect=document.getElementById("brandSelect");
 const modelSelect=document.getElementById("modelSelect");
-
 const calibScreen=document.getElementById("calibrationScreen");
 const calibSlider=document.getElementById("calibSlider");
 const cardBox=document.getElementById("cardBox");
@@ -245,8 +239,9 @@ function initDeviceSelector(devices){
   }
 
   brandSelect.addEventListener("change",()=>{
-    modelSelect.innerHTML=`<option value="">اختر الموديل</option>`;
+    modelSelect.innerHTML=`<option value="">— اختر الموديل —</option>`;
     modelSelect.disabled=true;
+
     const brand=brandSelect.value;
     if(!brand)return;
 
@@ -264,28 +259,28 @@ function initDeviceSelector(devices){
   });
 }
 
-/* ====================  شاشة المعايرة ====================== */
-
+/* ========== تحديث المربع حسب السلايدر ========== */
 function updateCardBoxFromSlider(){
-  const px=parseFloat(calibSlider.value);
+  const hPx=parseFloat(calibSlider.value);
   const ratio=53.98/85.6;
-  cardBox.style.height=px+"px";
-  cardBox.style.width=(px*ratio)+"px";
+  cardBox.style.height=hPx+"px";
+  cardBox.style.width=(hPx*ratio)+"px";
 }
 
+/* ========== بدء المعايرة ========== */
 startCalib.addEventListener("click",()=>{
   if(!selectedDevice){
     alert("اختر الشركة والموديل أولاً");
     return;
   }
 
-  const maxPx=Math.round(window.innerHeight*0.8);
-  const minPx=Math.round(maxPx*0.2);
+  const maxPx=Math.round(window.innerHeight*0.9);
+  const minPx=Math.round(window.innerHeight*0.2);
 
   calibSlider.min=minPx;
   calibSlider.max=maxPx;
 
-  /* 🔥 حجم أولي صغير ومناسب */
+  /* ⭐ حجم مبدئي صغير مناسب */
   calibSlider.value=Math.round(window.innerHeight*0.30);
   updateCardBoxFromSlider();
 
@@ -294,9 +289,11 @@ startCalib.addEventListener("click",()=>{
 
 calibSlider.addEventListener("input",updateCardBoxFromSlider);
 
+/* ========== حفظ المعايرة ========== */
 doneCalib.addEventListener("click",()=>{
   const px=parseFloat(calibSlider.value);
   const realMM=85.6;
+
   scaleFactor=px/realMM;
   localStorage.setItem("scaleFactor",scaleFactor);
 
@@ -308,9 +305,9 @@ doneCalib.addEventListener("click",()=>{
   pxPerMM=scaleFactor;
 });
 
-/* ===================  كود رسم الخاتم الأصلي =================== */
-
+/* ========== رسم الخاتم ========== */
 let pxPerMM=scaleFactor;
+
 const PI=Math.PI;
 const US_MIN=4,US_MAX=14;
 
@@ -321,8 +318,8 @@ const usToJP=us=>us+12;
 
 const UK_STEPS=[
 "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½","N","N½",
-"O","O½","P","P½","Q","Q½","R","R½","S","S½","T","T½",
-"U","U½","V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"
+"O","O½","P","P½","Q","Q½","R","R½","S","S½","T","T½","U","U½",
+"V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"
 ];
 
 const usToUK=(us)=>{
@@ -338,35 +335,28 @@ const ukToUs=uk=>{
   return US_MIN+(i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
 };
 
+const $=id=>document.getElementById(id);
+const el={
+  us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"),
+  diameter:$("diameter"), circ:$("circ"),
+  error:$("error"), laser:$("laser"),
+  slider:$("slider"), sizeLabel:$("sizeLabel"),
+  outer:$("outer"), inner:$("inner"), diamond:$("diamond")
+};
+
 let updating=false;
 
 const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
 
-const el={
-  us:document.getElementById("us"),
-  uk:document.getElementById("uk"),
-  fr:document.getElementById("fr"),
-  jp:document.getElementById("jp"),
-  diameter:document.getElementById("diameter"),
-  circ:document.getElementById("circ"),
-  error:document.getElementById("error"),
-  laser:document.getElementById("laser"),
-  slider:document.getElementById("slider"),
-  sizeLabel:document.getElementById("sizeLabel"),
-  outer:document.getElementById("outer"),
-  inner:document.getElementById("inner"),
-  diamond:document.getElementById("diamond")
-};
-
 function drawRing(mm){
   const r=(mm/2)*pxPerMM;
-  const cx=180, cy=190;
+  const cx=180,cy=190;
 
   el.outer.setAttribute("r",r);
   el.inner.setAttribute("r",r/1.7);
 
   const dy=cy-r-20;
-  el.diamond.setAttribute("points",
+  el.diamond.setAttribute('points',
     `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
   );
 }
@@ -376,6 +366,7 @@ function updateAllFromUS(us){
     el.error.textContent="❌ المقاس خارج النطاق (4 — 14)";
     return;
   }
+
   el.error.textContent="";
 
   const d=usToDiameter(us);
@@ -404,13 +395,13 @@ const tryNum=v=>{
   return Number.isFinite(n)?n:null;
 };
 
-el.us.addEventListener("input",()=>{if(!updating){let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n)}})
-el.uk.addEventListener("input",()=>{if(!updating){let u=ukToUs(el.uk.value);if(u!=null)updateAllFromUS(u)}})
-el.fr.addEventListener("input",()=>{if(!updating){let n=tryNum(el.fr.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))}})
-el.jp.addEventListener("input",()=>{if(!updating){let n=tryNum(el.jp.value);if(n!=null)updateAllFromUS(n-12)}})
-el.diameter.addEventListener("input",()=>{if(!updating){let n=tryNum(el.diameter.value);if(n!=null)updateAllFromUS(diameterToUs(n))}})
-el.circ.addEventListener("input",()=>{if(!updating){let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))}})
-el.slider.addEventListener("input",()=>{if(!updating){updateAllFromUS(parseFloat(el.slider.value))}});
+el.us.addEventListener("input",()=>{if(!updating){let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n);} });
+el.uk.addEventListener("input",()=>{if(!updating){let u=ukToUs(el.uk.value);if(u!=null)updateAllFromUS(u);} });
+el.fr.addEventListener("input",()=>{if(!updating){let n=tryNum(el.fr.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI));} });
+el.jp.addEventListener("input",()=>{if(!updating){let n=tryNum(el.jp.value);if(n!=null)updateAllFromUS(n-12);} });
+el.diameter.addEventListener("input",()=>{if(!updating){let n=tryNum(el.diameter.value);if(n!=null)updateAllFromUS(diameterToUs(n));} });
+el.circ.addEventListener("input",()=>{if(!updating){let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI));} });
+el.slider.addEventListener("input",()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
 updateAllFromUS(8);
 </script>
