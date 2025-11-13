@@ -24,21 +24,12 @@
 
     *{box-sizing:border-box}
     body{
-      margin:0;
-      background:var(--bg);
-      color:var(--ink);
-      font-family:'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin:0;background:var(--bg);color:var(--ink);
+      font-family:'Tajawal', sans-serif;
     }
 
     .wrap{max-width:1100px;margin:24px auto;padding:16px}
-    .title{
-      font-size:28px;
-      font-weight:800;
-      margin:0 0 14px;
-      display:flex;
-      gap:10px;
-      align-items:center
-    }
+    .title{font-size:28px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
 
     .card{
       background:var(--card);
@@ -49,49 +40,77 @@
     }
 
     .step-box{
-      background:white;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      margin-top:8px;
-      font-size:15px;
-      line-height:1.8;
+      background:white;padding:14px;border-radius:12px;border:1px solid var(--border);
+      margin-top:8px;font-size:15px;line-height:1.8;
     }
 
     #startCalib{
-      margin-top:14px;
-      padding:12px;
-      border-radius:12px;
-      background:var(--accent);
-      color:white;
-      border:none;
-      font-size:17px;
+      margin-top:14px;padding:12px;border-radius:12px;
+      background:var(--accent);color:white;border:none;
+      font-size:17px;width:100%;cursor:pointer;
+    }
+
+    /* شاشة المعايرة */
+    #calibrationScreen{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,.85);padding:30px;
+      color:white;text-align:center;z-index:99999;
+    }
+
+    #calibrationRow{
+      margin:25px auto;
+      display:flex;align-items:center;justify-content:center;
+      gap:20px;
+    }
+
+    /* الحاوية */
+    #cardContainer{
+      position:relative;display:flex;
+      align-items:center;justify-content:flex-end;
+    }
+
+    /* نصف البطاقة */
+    #cardBox{
+      background:white;
+      border:4px solid #3e000c;
+      border-radius:10px;
+      box-shadow:0 0 12px rgba(0,0,0,.35);
+    }
+
+    /* الخط التفاعلي */
+    #halfLine{
+      position:absolute;
+      right:0;
+      width:4px;
+      background:#3e000c;
+      border-radius:4px;
+    }
+
+    /* النص والسهم */
+    #hintBox{
+      display:flex;flex-direction:row;
+      align-items:center;gap:5px;font-size:16px;
+      color:white;white-space:nowrap;
+    }
+    .arrow{font-size:22px;font-weight:bold;}
+
+    #calibSlider{
       width:100%;
-      cursor:pointer;
+      appearance:none;height:6px;border-radius:999px;
+      background:#ead8bb;margin-top:20px;
+    }
+    #calibSlider::-webkit-slider-thumb{
+      appearance:none;width:22px;height:22px;border-radius:50%;
+      background:var(--accent-2);border:3px solid white;
     }
 
-    /* شبكة المحتوى */
-    .grid{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:16px;
-    }
-    @media(max-width:900px){
-      .grid{grid-template-columns:1fr;}
-    }
-
+    /* باقي الصفحة */
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
     svg{max-width:380px;height:auto;margin:auto;display:block}
 
-    .ring-stroke{
-      stroke:#3e000c !important;
-      stroke-width:6 !important;
-      fill:transparent;
-    }
-    .ring-stroke-inner{
-      stroke:#3e000c !important;
-      stroke-width:3 !important;
-      fill:white;
-    }
+    .ring-stroke{stroke:#3e000c !important;stroke-width:6 !important;fill:transparent}
+    .ring-stroke-inner{stroke:#3e000c !important;stroke-width:3 !important;fill:white}
 
     .diamond{animation:sparkle 1.3s infinite}
     @keyframes sparkle{
@@ -99,99 +118,11 @@
       50%{fill:#bde3fb}
       100%{fill:#89CFF0}
     }
-
-    input,select{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:12px;
-      font-size:16px;
-      background:white;
-      color:var(--ink);
-    }
-
-    input[type=range]{
-      appearance:none;
-      width:100%;
-      height:6px;
-      border-radius:999px;
-      background:#ead8bb;
-    }
-    input[type=range]::-webkit-slider-thumb{
-      appearance:none;
-      width:18px;
-      height:18px;
-      border-radius:50%;
-      background:var(--accent-2);
-      border:2px solid white;
-    }
-
-    /* شاشة المعايرة */
-    #calibrationScreen{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.85);
-      backdrop-filter:blur(4px);
-      padding:24px 16px;
-      color:white;
-      text-align:center;
-      z-index:9999;
-    }
-
-    #calibrationInner{
-      max-width:480px;
-      margin:0 auto;
-    }
-
-    #calibrationRow{
-      margin:20px 0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:18px;
-    }
-
-    #cardBox{
-      background:white;
-      border:4px solid #3e000c;  /* إطار عنابي */
-      border-radius:10px;
-      box-shadow:0 0 12px rgba(0,0,0,.35);
-    }
-
-    #hintBox{
-      display:flex;
-      flex-direction:row;
-      align-items:center;
-      gap:6px;
-      font-size:15px;
-      white-space:nowrap;
-    }
-
-    #hintBox .arrow{
-      font-size:20px;
-      line-height:1;
-    }
-
-    #calibSlider{
-      appearance:none;
-      width:100%;
-      height:6px;
-      border-radius:999px;
-      background:#ead8bb;
-    }
-    #calibSlider::-webkit-slider-thumb{
-      appearance:none;
-      width:22px;
-      height:22px;
-      border-radius:50%;
-      background:var(--accent-2);
-      border:3px solid white;
-    }
   </style>
 </head>
 
 <body>
+
   <div class="wrap">
 
     <h1 class="title">💎 اعرف مقاسك</h1>
@@ -199,282 +130,239 @@
     <div class="card">
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
-        <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>2)</b> ضع البطاقة بشكل عرضي على شاشة الجوال، بحيث نصفها فوق الشاشة ونصفها خارجها.<br>
-        <b>3)</b> ضع نصف البطاقة فوق المستطيل الأبيض، وحاول تطابقه تمامًا (نفس نصف البطاقة).<br>
-        <b>4)</b> حرّك السلايدر حتى يصبح المستطيل نفس نصف البطاقة بالحجم الحقيقي.<br>
-        <b>5)</b> اضغط حفظ وإغلاق.<br><br>
-        بعدها يظهر الخاتم بالحجم الحقيقي 🙌💛
+        <b>1)</b> اضغط “بدء المعايرة”.<br>
+        <b>2)</b> ضع البطاقة بشكل عرضي على الشاشة، نصفها داخل ونصفها خارج.<br>
+        <b>3)</b> طابق المستطيل الأبيض مع نصف البطاقة بالحجم الحقيقي.<br>
+        <b>4)</b> اضغط حفظ وإغلاق.<br><br>
+        بعدها الخاتم يظهر بالحجم الحقيقي 🔥💛
       </div>
       <button id="startCalib">بدء المعايرة</button>
       <div id="calibStatus" style="margin-top:8px;color:var(--muted)">لم تتم المعايرة بعد</div>
     </div>
 
     <div class="grid">
-
-      <!-- الرسم أولاً -->
+      <!-- الرسم -->
       <div class="card">
-        <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
-          المقاس الحالي: — (US)
-        </div>
+        <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">المقاس الحالي: — (US)</div>
 
         <svg id="ringSvg" viewBox="0 0 360 360">
-          <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
-          <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
+          <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60"/>
+          <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35"/>
           <polygon id="diamond" class="diamond"
             points="180,90 170,100 180,110 190,100"
-            stroke="#5a9bd4" stroke-width="2" fill="#89CFF0" />
+            stroke="#5a9bd4" stroke-width="2" fill="#89CFF0"/>
         </svg>
 
         <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
-        <div style="font-size:13px;color:var(--muted)">اسحب الشريط أو غيّر أي خانة بالأعلى</div>
       </div>
 
       <!-- المدخلات -->
       <div class="card">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-
-          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal"></div>
-          <div><label>المقاس البريطاني (UK)</label><input id="uk"></div>
-          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"></div>
-          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"></div>
-          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"></div>
-          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"></div>
-
+          <div><label>US</label><input id="us"></div>
+          <div><label>UK</label><input id="uk"></div>
+          <div><label>FR</label><input id="fr"></div>
+          <div><label>JP</label><input id="jp"></div>
+          <div><label>القطر (mm)</label><input id="diameter"></div>
+          <div><label>المحيط (mm)</label><input id="circ"></div>
           <div id="error" style="color:#c81e1e;font-weight:bold"></div>
           <div id="laser" style="color:#001f3f;font-weight:bold"></div>
-
         </div>
       </div>
 
     </div>
+
   </div>
 
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
-    <div id="calibrationInner">
-      <h2>🔧 المعايرة</h2>
-      <p>ضع نصف البطاقة فوق المستطيل، ثم حرّك السلايدر حتى يطابق نصف البطاقة بالحجم.</p>
+    <h2>🔧 المعايرة</h2>
+    <p>طابق المستطيل مع نصف البطاقة بالحجم الحقيقي.</p>
 
-      <div id="calibrationRow">
-        <!-- المربع الذي يمثل نصف البطاقة -->
+    <div id="calibrationRow">
+
+      <div id="cardContainer">
         <div id="cardBox"></div>
-
-        <!-- النص مع السهم بجانب المربع -->
-        <div id="hintBox">
-          <span>ضع البطاقة هنا</span>
-          <span class="arrow">←</span>
-        </div>
+        <div id="halfLine"></div>
       </div>
 
-      <input type="range" id="calibSlider">
+      <div id="hintBox">
+        <span>ضع البطاقة هنا</span>
+        <span class="arrow">→</span>
+      </div>
 
-      <button id="doneCalib"
-        style="margin-top:20px;padding:12px;border-radius:12px;
-        background:var(--accent);color:white;border:none;font-size:17px;width:100%">
-        حفظ وإغلاق
-      </button>
     </div>
+
+    <input type="range" id="calibSlider">
+
+    <button id="doneCalib"
+      style="margin-top:20px;padding:12px;border-radius:12px;
+      background:var(--accent);color:white;border:none;font-size:17px;width:100%">
+      حفظ وإغلاق
+    </button>
   </div>
 
-  <script>
-    /************* معايرة البطاقة (نصف البطاقة بالعرض) *************/
-    const calibScreen   = document.getElementById("calibrationScreen");
-    const calibSlider   = document.getElementById("calibSlider");
-    const cardBox       = document.getElementById("cardBox");
-    const startCalib    = document.getElementById("startCalib");
-    const doneCalib     = document.getElementById("doneCalib");
-    const calibStatus   = document.getElementById("calibStatus");
+<script>
+/************** معايرة نصف البطاقة **************/
+const calibScreen   = document.getElementById("calibrationScreen");
+const calibSlider   = document.getElementById("calibSlider");
+const cardBox       = document.getElementById("cardBox");
+const halfLine      = document.getElementById("halfLine");
+const startCalib    = document.getElementById("startCalib");
+const doneCalib     = document.getElementById("doneCalib");
+const calibStatus   = document.getElementById("calibStatus");
 
-    // أبعاد البطاقة الحقيقية (بطاقة بنك / هوية) أفقية:
-    // العرض (الطول الأفقي) = 85.6mm
-    // الارتفاع (الضلع القصير) = 53.98mm
-    const CARD_LONG_MM  = 85.6;     // الضلع الطويل
-    const CARD_SHORT_MM = 53.98;    // الضلع القصير (ارتفاع البطاقة)
-    const HALF_LONG_MM  = CARD_LONG_MM / 2;  // نصف البطاقة (اللي نعايره)
+// أبعاد البطاقة الحقيقية
+const FULL_WIDTH_MM = 85.6;   // بطاقة أفقية
+const HALF_MM       = FULL_WIDTH_MM / 2;
+const HEIGHT_MM     = 53.98;
 
-    // scaleFactor = كم بكسل لكل 1mm
-    let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
-    let pxPerMM     = scaleFactor; // تُستخدم في رسم الخاتم
+let scaleFactor = localStorage.scaleFactor
+  ? parseFloat(localStorage.scaleFactor)
+  : 6.8;
 
-    // تحديث شكل مستطيل المعايرة (يمثل نصف البطاقة بالحجم الحقيقي)
-    function updateCardBoxFromSlider(){
-      const halfWidthPx = parseFloat(calibSlider.value); // عرض نصف البطاقة على الشاشة بالبكسل
+let pxPerMM = scaleFactor;
 
-      // نستخدم scale مؤقت لحساب الارتفاع بنفس النسبة الحقيقية
-      const tempScale   = halfWidthPx / HALF_LONG_MM; // بكسل لكل 1mm (نصف البطاقة)
-      const heightPx    = CARD_SHORT_MM * tempScale;  // ارتفاع البطاقة بالبكسل
+// المربع يمثل نصف البطاقة بالأبعاد الحقيقية
+function updateCardBoxFromSlider(){
+  const halfWidthPx = parseFloat(calibSlider.value);
 
-      cardBox.style.width  = halfWidthPx + "px";  // يمثل نصف عرض البطاقة
-      cardBox.style.height = heightPx    + "px";  // يمثل ارتفاع البطاقة الحقيقي بنسبة وتناسب
-    }
+  const tempScale = halfWidthPx / HALF_MM;
+  const heightPx  = HEIGHT_MM * tempScale;
 
-    startCalib.addEventListener("click", ()=>{
-      // نخلي مدى السلايدر يناسب أغلب الأجهزة
-      const maxHalfWidthPx = Math.round(window.innerWidth * 0.9);
+  cardBox.style.width  = halfWidthPx + "px";
+  cardBox.style.height = heightPx    + "px";
 
-      calibSlider.min   = 40;   // صغير مبدئياً
-      calibSlider.max   = maxHalfWidthPx;
-      calibSlider.value = Math.round(maxHalfWidthPx * 0.5); // قيمة متوسطة
+  // الخط التفاعلي
+  halfLine.style.height = heightPx + "px";
+}
 
-      updateCardBoxFromSlider();
-      calibScreen.style.display = "block";
-    });
+startCalib.addEventListener("click", ()=>{
+  calibSlider.min = 40;
+  calibSlider.max = Math.round(window.innerWidth * 0.9);
+  calibSlider.value = 130;
 
-    calibSlider.addEventListener("input", updateCardBoxFromSlider);
+  updateCardBoxFromSlider();
+  calibScreen.style.display = "block";
+});
 
-    doneCalib.addEventListener("click", ()=>{
-      const halfWidthPx = parseFloat(calibSlider.value);
+calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
-      // الآن نحسب scaleFactor الحقيقي بناءً على نصف البطاقة:
-      // نصف البطاقة الحقيقي = HALF_LONG_MM mm
-      // نصف البطاقة على الشاشة = halfWidthPx px
-      scaleFactor = halfWidthPx / HALF_LONG_MM; // px لكل 1mm
-      pxPerMM     = scaleFactor;
+doneCalib.addEventListener("click", ()=>{
 
-      localStorage.setItem("scaleFactor", scaleFactor);
+  const halfWidthPx = parseFloat(calibSlider.value);
 
-      calibStatus.textContent = "✔ تمت المعايرة بنجاح";
-      calibStatus.style.color = "green";
+  scaleFactor = halfWidthPx / HALF_MM;
+  pxPerMM     = scaleFactor;
 
-      calibScreen.style.display = "none";
+  localStorage.setItem("scaleFactor", scaleFactor);
 
-      // نعيد رسم الخاتم على المقاس الحالي بعد تحديث pxPerMM
-      const currentUS = parseFloat(document.getElementById("us").value) || 8;
-      updateAllFromUS(currentUS);
-    });
+  calibStatus.textContent = "✔ تمت المعايرة بنجاح";
+  calibStatus.style.color = "green";
 
-    /************* محاكاة المقاسات والخاتم *************/
-    const PI = Math.PI;
-    const US_MIN = 4, US_MAX = 14;
+  calibScreen.style.display = "none";
 
-    const usToDiameter   = us => 11.63 + 0.8128 * us;
-    const diameterToUs   = d  => (d - 11.63) / 0.8128;
-    const diameterToCirc = d  => PI * d;
-    const usToJP         = us => us + 12;
+  const currentUS = parseFloat(document.getElementById("us").value) || 8;
+  updateAllFromUS(currentUS);
+});
 
-    const UK_STEPS = [
-      "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
-      "N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
-      "T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
-      "Z","Z+½","Z+1"
-    ];
+/************** الخاتم **************/
+const PI=Math.PI;
+const US_MIN=4,US_MAX=14;
 
-    const usToUK = (us)=>{
-      const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
-      return UK_STEPS[Math.round(Math.min(Math.max(idx,0),UK_STEPS.length-1))];
-    };
+const usToDiameter=us=>11.63+0.8128*us;
+const diameterToUs=d=>(d-11.63)/0.8128;
+const diameterToCirc=d=>PI*d;
+const usToJP=us=>us+12;
 
-    const normalizeUK = s => s.trim().toUpperCase().replace("1/2","½");
-    const ukToUs = uk => {
-      const i = UK_STEPS.indexOf(normalizeUK(uk));
-      if(i<0) return null;
-      return US_MIN + (i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
-    };
+const UK_STEPS=[
+"H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
+"N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
+"T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"
+];
 
-    const $ = id => document.getElementById(id);
-    const el = {
-      us: $("us"), uk: $("uk"), fr: $("fr"), jp: $("jp"),
-      diameter: $("diameter"), circ: $("circ"),
-      error: $("error"), laser: $("laser"),
-      slider: $("slider"), sizeLabel: $("sizeLabel"),
-      outer: $("outer"), inner: $("inner"), diamond: $("diamond")
-    };
+const usToUK=us=>{
+  const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
+  return UK_STEPS[Math.round(Math.min(Math.max(idx,0),UK_STEPS.length-1))];
+};
 
-    let updating = false;
+const normalizeUK=s=>s.trim().toUpperCase().replace("1/2","½");
+const ukToUs=uk=>{
+  const i=UK_STEPS.indexOf(normalizeUK(uk));
+  if(i<0)return null;
+  return US_MIN+(i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
+};
 
-    const fmt = (n,d=2)=>
-      Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
+const $=id=>document.getElementById(id);
+const el={
+  us:$("us"),uk:$("uk"),fr:$("fr"),jp:$("jp"),
+  diameter:$("diameter"),circ:$("circ"),
+  error:$("error"),laser:$("laser"),
+  slider:$("slider"),sizeLabel:$("sizeLabel"),
+  outer:$("outer"),inner:$("inner"),diamond:$("diamond")
+};
 
-    function drawRing(diameterMM){
-      const rPx = (diameterMM/2) * pxPerMM;
-      const cx = 180, cy = 190;
+let updating=false;
 
-      el.outer.setAttribute('r', rPx);
-      el.inner.setAttribute('r', rPx/1.7);
+const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,"").replace(/\.$/,"");
 
-      const dy = cy - rPx - 20;
-      el.diamond.setAttribute('points',
-        `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
-      );
-    }
+function drawRing(diameterMM){
+  const rPx=(diameterMM/2)*pxPerMM;
+  el.outer.setAttribute("r",rPx);
+  el.inner.setAttribute("r",rPx/1.7);
 
-    function updateAllFromUS(us){
-      if(us < US_MIN || us > US_MAX){
-        el.error.textContent = "❌ المقاس خارج النطاق (4 — 14)";
-        return;
-      }
-      el.error.textContent = "";
+  const cx=180,cy=190;
+  const dy=cy-rPx-20;
 
-      const d  = usToDiameter(us);
-      const c  = diameterToCirc(d);
-      const jp = usToJP(us);
-      const uk = usToUK(us);
+  el.diamond.setAttribute("points",
+    `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
+  );
+}
 
-      updating = true;
-      el.us.value       = fmt(us,2);
-      el.uk.value       = uk;
-      el.fr.value       = fmt(c,1);
-      el.jp.value       = fmt(jp,1);
-      el.diameter.value = fmt(d,2);
-      el.circ.value     = fmt(c,1);
-      el.slider.value   = us;
-      updating = false;
+function updateAllFromUS(us){
+  if(us<US_MIN||us>US_MAX){
+    el.error.textContent="❌ خارج النطاق (4 — 14)";
+    return;
+  }
+  el.error.textContent="";
 
-      el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
-      drawRing(d);
-      el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
-    }
+  const d=usToDiameter(us);
+  const c=diameterToCirc(d);
+  const jp=usToJP(us);
+  const uk=usToUK(us);
 
-    const tryNum = v =>{
-      if(!v) return null;
-      v = (""+v).trim();
-      const n = Number(v);
-      return Number.isFinite(n) ? n : null;
-    };
+  updating=true;
+  el.us.value=fmt(us,2);
+  el.uk.value=uk;
+  el.fr.value=fmt(c,1);
+  el.jp.value=fmt(jp,1);
+  el.diameter.value=fmt(d,2);
+  el.circ.value=fmt(c,1);
+  el.slider.value=us;
+  updating=false;
 
-    el.us.addEventListener('input',()=>{
-      if(updating) return;
-      let n = tryNum(el.us.value);
-      if(n != null) updateAllFromUS(n);
-    });
+  el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
+  drawRing(d);
+  el.laser.textContent=`القيمة للماكينة: ${fmt(c,1)} mm`;
+}
 
-    el.uk.addEventListener('input',()=>{
-      if(updating) return;
-      let us = ukToUs(el.uk.value);
-      if(us != null) updateAllFromUS(us);
-    });
+const tryNum=v=>{
+  if(!v)return null;
+  v=(""+v).trim();
+  const n=Number(v);
+  return Number.isFinite(n)?n:null;
+};
 
-    el.fr.addEventListener('input',()=>{
-      if(updating) return;
-      let n = tryNum(el.fr.value);
-      if(n != null) updateAllFromUS(diameterToUs(n/PI));
-    });
+el.us.addEventListener("input",()=>{if(updating)return;let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n)});
+el.uk.addEventListener("input",()=>{if(updating)return;let us=ukToUs(el.uk.value);if(us!=null)updateAllFromUS(us)});
+el.fr.addEventListener("input",()=>{if(updating)return;let n=tryNum(el.fr.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.jp.addEventListener("input",()=>{if(updating)return;let n=tryNum(el.jp.value);if(n!=null)updateAllFromUS(n-12)});
+el.diameter.addEventListener("input",()=>{if(updating)return;let n=tryNum(el.diameter.value);if(n!=null)updateAllFromUS(diameterToUs(n))});
+el.circ.addEventListener("input",()=>{if(updating)return;let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.slider.addEventListener("input",()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
-    el.jp.addEventListener('input',()=>{
-      if(updating) return;
-      let n = tryNum(el.jp.value);
-      if(n != null) updateAllFromUS(n-12);
-    });
+updateAllFromUS(8);
+</script>
 
-    el.diameter.addEventListener('input',()=>{
-      if(updating) return;
-      let n = tryNum(el.diameter.value);
-      if(n != null) updateAllFromUS(diameterToUs(n));
-    });
-
-    el.circ.addEventListener('input',()=>{
-      if(updating) return;
-      let n = tryNum(el.circ.value);
-      if(n != null) updateAllFromUS(diameterToUs(n/PI));
-    });
-
-    el.slider.addEventListener('input',()=>{
-      if(!updating) updateAllFromUS(parseFloat(el.slider.value));
-    });
-
-    // بداية افتراضية
-    updateAllFromUS(8);
-  </script>
 </body>
 </html>
