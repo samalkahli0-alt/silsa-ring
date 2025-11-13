@@ -1,250 +1,263 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>معايرة ومضاهاة مقاس الخاتم</title>
-<style>
-  body{font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#fafafa;margin:0;padding:20px;text-align:center}
-  .card{background:#eee;border:2px dashed #44080f;margin-bottom:12px;transition:width .15s,height .15s}
-  .label{color:#44080f;font-weight:700;margin:8px 0}
-  .controls{max-width:420px;width:100%}
-  input[type=range]{width:100%}
-  .divider{height:1px;background:#ddd;width:100%;margin:18px 0}
-  .circle{background:#44080f;border-radius:50%;margin:14px 0;transition:width .2s,height .2s;display:inline-block}
-  .overlay-wrap{position:relative;display:inline-block}
-  .overlay-ring{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    border:4px solid rgba(68,8,15,0.9);border-radius:50%;box-sizing:border-box;
-    background:transparent;pointer-events:none;
-  }
-  .btn{background:#44080f;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;margin:6px}
-  .small{font-size:13px;color:#666}
-  select,input[type=number]{padding:6px;border:1px solid #ccc;border-radius:6px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💎 محاكاة مقاس الخاتم — SILSA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#ffeed3;           /* خلفية عاجية */
+      --ink:#3e000c;          /* عنابي غامق للنص */
+      --muted:#7e4a55;        /* نص ثانوي عنابي فاتح */
+      --card:#fff7ea;         /* بطاقة فاتحة */
+      --border:#f1d7b8;       /* حدود ناعمة */
+      --accent:#b8860b;       /* ذهبي ناعم للأزرار */
+      --accent-2:#d4af37;     /* ذهبي لامع خفيف */
+      --diamond-1:#89CFF0;    /* تدرج ماسة */
+      --diamond-2:#bde3fb;    /* تدرج ماسة */
+      --danger:#c81e1e;       /* أحمر للخطأ */
+      --navy:#001f3f;         /* كحلي لليزر */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,Arial}
+    .wrap{max-width:1100px;margin:24px auto;padding:16px}
+    .title{font-size:26px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
+    .subtitle{color:var(--muted);margin-bottom:18px}
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr;}}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
+    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
+    input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:#fff;outline:none;color:var(--ink)}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .full{grid-column:1/-1}
+
+    .error{color:var(--danger);font-weight:800;margin-top:8px;min-height:1.5em}
+    .laser{color:var(--navy);font-weight:800;margin-top:8px;white-space:pre-line;min-height:2.6em}
+
+    /* مساحة الرسم */
+    .canvas-card{display:flex;flex-direction:column;align-items:center;gap:10px}
+    svg{max-width:380px;height:auto;display:block}
+    .size-label{font-weight:800;color:var(--ink)}
+
+    /* حلقة معدنية بواقعية أعلى */
+    .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill);filter:drop-shadow(0 6px 12px rgba(62,0,12,.12))}
+    .ring-stroke-inner{stroke:url(#innerGrad);stroke-width:4;fill:#fff}
+    .diamond{filter:drop-shadow(0 3px 6px rgba(0,0,0,.15))}
+
+    /* شريط التحكم */
+    .slider-wrap{display:flex;align-items:center;gap:10px;width:100%;}
+    input[type=range]{appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;outline:none}
+    input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent-2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
+    input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent-2);border:2px solid #fff;box-shadow:0 0 0 2px rgba(212,175,55,.35);cursor:pointer}
+
+    /* تلألؤ الماسة */
+    @keyframes sparkle{0%{fill:var(--diamond-1)}50%{fill:var(--diamond-2)}100%{fill:var(--diamond-1)}}
+    .sparkle{animation:sparkle 1.2s ease-in-out infinite}
+
+    /* معايرة الحجم الواقعي */
+    .calib-bar{height:12px;background:linear-gradient(90deg,#fff,#f9e8c8);border:1px solid var(--border);border-radius:999px;position:relative}
+    .calib-bar::before,.calib-bar::after{content:"";position:absolute;top:-6px;width:2px;height:24px;background:var(--accent-2)}
+    .calib-bar::before{left:0}.calib-bar::after{right:0}
+    .hint{font-size:12px;color:var(--muted)}
+    .badge{display:inline-block;background:rgba(212,175,55,.14);color:var(--ink);border:1px solid var(--accent-2);padding:4px 8px;border-radius:999px;font-size:12px}
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
+    <div class="subtitle">اضبطي المقاس بدقة، وعايري الحجم ليطابق الواقع على شاشة هاتفك.</div>
 
-  <h2>معايرة الشاشة + مضاهاة الخاتم</h2>
+    <div class="grid">
+      <!-- الإدخالات -->
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>سماكة الفضة (mm)</label>
+            <select id="thickness">
+              <option>1.0</option>
+              <option>1.2</option>
+              <option>1.5</option>
+              <option>1.75</option>
+              <option>2.0</option>
+            </select>
+          </div>
+          <div style="align-self:end" class="hint">تؤثّر على قيمة الليزر فقط</div>
+        </div>
 
-  <!-- STEP 1: بطاقة بالطول -->
-  <div class="label">🔧 خطوة 1: عاير الشاشة باستخدام بطاقة (ضعها عموديًا)</div>
-  <div id="card" class="card"></div>
-  <div class="controls">
-    <input id="calibrate" type="range" min="100" max="500" value="200">
-    <div class="small">الطول الحالي: <span id="calLabel">200</span> px</div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label>المقاس الأمريكي (US)</label>
+            <input id="us" inputmode="decimal" placeholder="مثال: 7.5" />
+          </div>
+          <div>
+            <label>المقاس البريطاني (UK)</label>
+            <input id="uk" placeholder="مثال: K½" />
+          </div>
+          <div>
+            <label>المقاس الفرنسي (FR)</label>
+            <input id="fr" inputmode="decimal" placeholder="المحيط بالـ mm" />
+          </div>
+          <div>
+            <label>المقاس الياباني (JP)</label>
+            <input id="jp" inputmode="decimal" placeholder="مثال: 19" />
+          </div>
+          <div>
+            <label>القطر الداخلي (mm)</label>
+            <input id="diameter" inputmode="decimal" placeholder="مثال: 18.1" />
+          </div>
+          <div>
+            <label>المحيط (mm)</label>
+            <input id="circ" inputmode="decimal" placeholder="π × القطر" />
+          </div>
+          <div class="full error" id="error"></div>
+          <div class="full laser" id="laser"></div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="row3">
+            <div>
+              <label>مرجع المعايرة (مم)</label>
+              <input id="calibRefMm" type="number" min="5" max="100" step="0.5" value="25" />
+            </div>
+            <div>
+              <label>تكبير شريط المعايرة</label>
+              <input id="calibSlider" type="range" min="20" max="800" step="1" value="150" />
+            </div>
+            <div style="display:flex;align-items:end">
+              <span class="badge" id="pxPerMmBadge">1 مم ≈ — بكسل</span>
+            </div>
+          </div>
+          <div class="full" style="margin-top:10px">
+            <div id="calibBar" class="calib-bar" style="width:150px"></div>
+            <div class="hint" style="margin-top:6px">ضَعِي مسطرة على الشاشة، ثم كبّري/صغّري الشريط حتى يطابق <b id="refText">25 مم</b> بالضبط. بعدها سيكون الخاتم بحجم واقعي.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- الرسم والتحكم -->
+      <div class="card canvas-card">
+        <div id="sizeLabel" class="size-label">المقاس الحالي: — (US)</div>
+        <svg id="ringSvg" viewBox="0 0 360 360" aria-label="خاتم تفاعلي">
+          <defs>
+            <!-- تدرّجات معدنية -->
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d9d9d9"/>
+              <stop offset="50%" stop-color="#f3f3f3"/>
+              <stop offset="100%" stop-color="#c6c6c6"/>
+            </linearGradient>
+            <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#eee"/>
+              <stop offset="100%" stop-color="#fafafa"/>
+            </linearGradient>
+            <radialGradient id="ringFill" cx="50%" cy="40%" r="65%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="60%" stop-color="#f7f7f7"/>
+              <stop offset="100%" stop-color="#f0f0f0"/>
+            </radialGradient>
+          </defs>
+          <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
+          <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
+          <!-- الماسة عند الساعة 12 مع تلألؤ -->
+          <polygon id="diamond" class="sparkle diamond" points="180,90 170,100 180,110 190,100" fill="#89CFF0" stroke="#5a9bd4" stroke-width="2" />
+        </svg>
+        <div class="slider-wrap">
+          <span class="hint">4</span>
+          <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
+          <span class="hint">14</span>
+        </div>
+        <div class="hint">اسحبي الشريط أو عدّلي أي خانة بالأعلى — الكل يتحدث تلقائيًا ✨</div>
+      </div>
+    </div>
   </div>
 
-  <div class="divider"></div>
+  <script>
+    // === ثوابت ومعادلات ===
+    const PI = Math.PI; const US_MIN = 4, US_MAX = 14;
+    const usToDiameter = us => 11.63 + 0.8128 * us;      // mm
+    const diameterToUs = d => (d - 11.63) / 0.8128;      // US
+    const diameterToCirc = d => PI * d;                  // mm
+    const usToFR = us => diameterToCirc(usToDiameter(us));
+    const usToJP = us => us + 12;
 
-  <!-- STEP 2: محاكاة الخاتم العادية -->
-  <div class="label">💍 خطوة 2: اختيار مقاس الخاتم أو استخدام الـOverlay</div>
+    const UK_STEPS = [
+      "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
+      "N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
+      "T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½","Z","Z+½","Z+1"
+    ];
+    const usToUK = (us)=>{const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);return UK_STEPS[Math.max(0,Math.min(UK_STEPS.length-1,Math.round(idx)))]};
+    const normalizeUK = s => s.trim().toUpperCase().replace("1/2","½");
+    const ukToUs = uk => { const i = UK_STEPS.indexOf(normalizeUK(uk)); if(i<0) return null; return US_MIN + (i/(UK_STEPS.length-1))*(US_MAX-US_MIN); };
 
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;margin-bottom:8px">
-    <label class="small">طريقة المحاكاة:</label>
-    <select id="mode">
-      <option value="auto">اعرض دائرة بالحجم (اعتماد جدول القُطر الداخلي)</option>
-      <option value="overlay">مضاهاة بالخاتم الفعلي فوق الشاشة (Overlay)</option>
-    </select>
-  </div>
+    // DOM
+    const $ = id => document.getElementById(id);
+    const el = { thickness:$("thickness"), us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"), diameter:$("diameter"), circ:$("circ"), error:$("error"), laser:$("laser"), slider:$("slider"), sizeLabel:$("sizeLabel"), outer:$("outer"), inner:$("inner"), diamond:$("diamond"), calibRefMm:$("calibRefMm"), calibSlider:$("calibSlider"), calibBar:$("calibBar"), refText:$("refText"), pxPerMmBadge:$("pxPerMmBadge") };
 
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;margin-bottom:8px">
-    <label class="small">اختر المقاس (US)</label>
-    <select id="ringSize">
-      <option value="5">5</option><option value="6" selected>6</option><option value="7">7</option>
-      <option value="8">8</option><option value="9">9</option><option value="10">10</option>
-      <option value="11">11</option><option value="12">12</option><option value="13">13</option>
-    </select>
+    let updating = false;      // يمنع الحلقات
+    let pxPerMM = 6.8;         // قيمة افتراضية، ستُستبدل بالمعايرة
 
-    <label class="small">أو أدخل قطر داخلي مباشر (مم):</label>
-    <input id="manualMM" type="number" step="0.1" placeholder="مثال 16.5" style="width:95px">
-  </div>
+    function setError(msg){ el.error.textContent = msg || ""; if(msg) el.laser.textContent = ""; }
+    const fmt = (n,d=2)=> Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
 
-  <!-- area to show circle and overlay -->
-  <div class="overlay-wrap" id="displayArea" style="margin-top:8px">
-    <div id="simCircle" class="circle"></div>
-    <div id="overlayRing" class="overlay-ring" style="display:none"></div>
-  </div>
-
-  <div style="width:320px;margin-top:8px">
-    <input id="ringSlider" type="range" min="5" max="13" step="0.5" value="6">
-    <div class="small">المقاس المعروض: <span id="ringLabel">6 (16.5 مم)</span></div>
-  </div>
-
-  <div style="margin-top:12px">
-    <button id="applyOverlay" class="btn" style="display:none">اعتماد مقاس الـOverlay</button>
-    <button id="savePx" class="btn" style="background:#2a7f5f">حفظ px/mm (local)</button>
-    <button id="reset" class="btn" style="background:#777">إعادة ضبط</button>
-  </div>
-
-  <div style="margin-top:12px" class="small">حاليًا: 1 مم = <span id="pxmm">—</span> px</div>
-
-<script>
-  // CARD (vertical)
-  const CARD_WIDTH_MM = 53.98, CARD_HEIGHT_MM = 85.6; // we use height as controlled
-  const card = document.getElementById('card');
-  const calSlider = document.getElementById('calibrate');
-  const calLabel = document.getElementById('calLabel');
-
-  // ring sizes (INNER DIAMETER in mm) — ensure these are inner diameters
-  const ringSizes = {5:15.7,6:16.5,7:17.3,8:18.1,9:18.9,10:19.8,11:20.6,12:21.4,13:22.2};
-
-  // UI elements
-  const mode = document.getElementById('mode');
-  const ringSize = document.getElementById('ringSize');
-  const manualMM = document.getElementById('manualMM');
-  const simCircle = document.getElementById('simCircle');
-  const ringSlider = document.getElementById('ringSlider');
-  const ringLabel = document.getElementById('ringLabel');
-  const overlayRing = document.getElementById('overlayRing');
-  const displayArea = document.getElementById('displayArea');
-  const applyOverlay = document.getElementById('applyOverlay');
-  const pxmmEl = document.getElementById('pxmm');
-  const savePx = document.getElementById('savePx');
-  const reset = document.getElementById('reset');
-
-  let pxPerMM = localStorage.getItem('pxPerMM') ? parseFloat(localStorage.getItem('pxPerMM')) : null;
-
-  // initial card setup (height controlled)
-  function setCardHeight(h){
-    const ratio = CARD_WIDTH_MM / CARD_HEIGHT_MM;
-    card.style.height = h + 'px';
-    card.style.width = (h * ratio) + 'px';
-    calLabel.textContent = h;
-    // compute pxPerMM from height (height corresponds to CARD_HEIGHT_MM)
-    pxPerMM = h / CARD_HEIGHT_MM;
-    updateDisplay();
-  }
-
-  calSlider.addEventListener('input', ()=> setCardHeight(parseInt(calSlider.value)));
-
-  // set initial from saved or default
-  if(pxPerMM){
-    // derive a reasonable card height from stored px/mm
-    const h = Math.round(pxPerMM * CARD_HEIGHT_MM);
-    calSlider.value = Math.min(500, Math.max(100, h));
-  }
-  setCardHeight(parseInt(calSlider.value));
-
-  // update display (circle or overlay)
-  function getSelectedDiameterMM(){
-    const manual = parseFloat(manualMM.value);
-    if(!isNaN(manual) && manual>0) return manual;
-    const s = parseFloat(ringSize.value);
-    return ringSizes[s];
-  }
-
-  function updateDisplay(){
-    pxmmEl.textContent = pxPerMM ? pxPerMM.toFixed(3) : '—';
-    const diamMM = getSelectedDiameterMM();
-    ringLabel.textContent = `${ringSlider.value} (${diamMM} مم)`;
-
-    if(mode.value === 'auto'){
-      overlayRing.style.display = 'none';
-      applyOverlay.style.display = 'none';
-      simCircle.style.display = 'inline-block';
-      // compute px diameter from pxPerMM
-      const diamPX = diamMM * pxPerMM;
-      simCircle.style.width = diamPX + 'px';
-      simCircle.style.height = diamPX + 'px';
-      // center display area sizing
-      displayArea.style.width = Math.max(200, diamPX + 80) + 'px';
-      displayArea.style.height = Math.max(200, diamPX + 80) + 'px';
-    } else {
-      // overlay mode: show transparent ring outline to match real ring
-      simCircle.style.display = 'none';
-      overlayRing.style.display = 'block';
-      applyOverlay.style.display = 'inline-block';
-      // overlay initial size: use selected diameter if pxPerMM known, else use mid size
-      const initPX = pxPerMM ? diamMM * pxPerMM : 150;
-      setOverlaySize(initPX);
+    function drawRing(diameterMM){
+      const rPx = (diameterMM/2) * pxPerMM; // حجم واقعي حسب المعايرة
+      const cx = 180, cy = 190;
+      el.outer.setAttribute('r', rPx);
+      el.inner.setAttribute('r', rPx/1.7);
+      const dy = cy - rPx - 20;
+      el.diamond.setAttribute('points', `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`);
     }
-  }
 
-  // overlay resizing: user can use mouse wheel or pinch? we'll attach a hidden slider via keyboard +/- and mousewheel
-  let overlayPX = 150;
-  function setOverlaySize(px){
-    overlayPX = px;
-    overlayRing.style.width = overlayPX + 'px';
-    overlayRing.style.height = overlayPX + 'px';
-    // border thickness proportional (visual)
-    overlayRing.style.borderWidth = Math.max(3, Math.round(overlayPX * 0.03)) + 'px';
-    displayArea.style.width = Math.max(200, overlayPX + 80) + 'px';
-    displayArea.style.height = Math.max(200, overlayPX + 80) + 'px';
-  }
-
-  // Allow mouse wheel over displayArea to change overlay size
-  displayArea.addEventListener('wheel', (e)=>{
-    if(mode.value !== 'overlay') return;
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -4 : 4;
-    setOverlaySize(Math.max(30, overlayPX + delta));
-  });
-
-  // also allow +/- keys when overlay active
-  window.addEventListener('keydown',(e)=>{
-    if(mode.value !== 'overlay') return;
-    if(e.key === '+' || e.key === '=' ) setOverlaySize(overlayPX + 4);
-    if(e.key === '-' ) setOverlaySize(Math.max(10, overlayPX - 4));
-  });
-
-  // apply overlay: user must tell us the real diameter (from select or manual). Then we compute pxPerMM.
-  applyOverlay.addEventListener('click', ()=>{
-    const diamMM = getSelectedDiameterMM();
-    if(!diamMM || diamMM <= 0){ alert('أدخل قطرًا صحيحًا بالخانات أعلى (مثال 16.5 مم)'); return; }
-    // overlayPX corresponds to diamPX of inner diameter
-    pxPerMM = overlayPX / diamMM;
-    localStorage.setItem('pxPerMM', pxPerMM.toString());
-    alert('تم اعتماد المعايرة من الـOverlay. الآن المحاكاة ستطابق الخاتم الذي وضعته.');
-    updateDisplay();
-  });
-
-  // mode change
-  mode.addEventListener('change', ()=>{
-    if(mode.value === 'overlay'){
-      ringSlider.disabled = true;
-      applyOverlay.style.display = 'inline-block';
-      overlayRing.style.display = 'block';
-      simCircle.style.display = 'none';
-    } else {
-      ringSlider.disabled = false;
-      overlayRing.style.display = 'none';
-      applyOverlay.style.display = 'none';
-      simCircle.style.display = 'inline-block';
+    function updateAllFromUS(us){
+      if(us < US_MIN || us > US_MAX){ setError('❌ المقاس خارج النطاق (4 – 14)'); return; }
+      setError('');
+      const d = usToDiameter(us); const c = diameterToCirc(d); const fr = c; const jp = usToJP(us); const uk = usToUK(us);
+      updating = true;
+      el.us.value = fmt(us,2); el.uk.value = uk; el.fr.value = fmt(fr,1); el.jp.value = fmt(jp,1); el.diameter.value = fmt(d,2); el.circ.value = fmt(c,1); el.slider.value = us;
+      updating = false;
+      el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
+      drawRing(d);
+      const thick = parseFloat(el.thickness.value || '1');
+      const laserVal = (d + thick) * PI; el.laser.textContent = `القيمة المستخدمة في ماكينة الليزر: ${fmt(laserVal,1)} mm
+(سماكة الفضة: ${fmt(thick,2)} mm)`;
     }
-    updateDisplay();
-  });
 
-  // keep ringSlider & select in sync (slider changes the chosen size)
-  ringSlider.addEventListener('input', ()=>{
-    ringSize.value = ringSlider.value;
-    updateDisplay();
-  });
-  ringSize.addEventListener('change', ()=>{ ringSlider.value = ringSize.value; updateDisplay();});
-  manualMM.addEventListener('input', updateDisplay);
+    // === معايرة الحجم الواقعي ===
+    function applyCalibration(){
+      const refMm = parseFloat(el.calibRefMm.value) || 25; const barPx = parseFloat(el.calibSlider.value) || 150; pxPerMM = barPx / refMm; // بكسل لكل ملم
+      el.calibBar.style.width = `${barPx}px`; el.refText.textContent = `${fmt(refMm,1)} مم`; el.pxPerMmBadge.textContent = `1 مم ≈ ${fmt(pxPerMM,2)} بكسل`;
+      // أعد رسم الخاتم بالحجم الواقعي الحالي
+      const d = parseFloat(el.diameter.value); if(!isNaN(d)) drawRing(d);
+    }
 
-  // save px/mm
-  savePx.addEventListener('click', ()=>{
-    if(!pxPerMM){ alert('لا توجد قيمة px/mm حالياً للحفظ'); return; }
-    localStorage.setItem('pxPerMM', pxPerMM.toString());
-    alert('تم حفظ المعايرة في المتصفح. ستبقى حتى تمسح التخزين المحلي.');
-  });
+    // === معالجات الإدخال ===
+    const tryNum = (v)=>{ if(v==null) return null; v=(""+v).trim(); if(!v || v==='.'||v==='-'||v==='-.') return null; const n = Number(v); return Number.isFinite(n)? n : null; };
+    function handleUS(){ if(updating) return; const n = tryNum(el.us.value); if(n==null) return; updateAllFromUS(n); }
+    function handleDiameter(){ if(updating) return; const n = tryNum(el.diameter.value); if(n==null) return; updateAllFromUS(diameterToUs(n)); }
+    function handleCirc(){ if(updating) return; const n = tryNum(el.circ.value); if(n==null) return; updateAllFromUS(diameterToUs(n/PI)); }
+    function handleFR(){ if(updating) return; const n = tryNum(el.fr.value); if(n==null) return; updateAllFromUS(diameterToUs(n/PI)); }
+    function handleJP(){ if(updating) return; const n = tryNum(el.jp.value); if(n==null) return; updateAllFromUS(n-12); }
+    function handleUK(){ if(updating) return; const us = ukToUs(el.uk.value); if(us==null) return; updateAllFromUS(us); }
 
-  // reset
-  reset.addEventListener('click', ()=>{
-    localStorage.removeItem('pxPerMM');
-    pxPerMM = null;
-    calSlider.value = 200;
-    manualMM.value = '';
-    ringSize.value = '6';
-    ringSlider.value = '6';
-    mode.value = 'auto';
-    updateDisplay();
-  });
+    function handleSlider(){ if(updating) return; updateAllFromUS(parseFloat(el.slider.value)); }
+    function handleThickness(){ const d = tryNum(el.diameter.value); if(d==null){ el.laser.textContent=''; return; } const t = parseFloat(el.thickness.value)||1; const laserVal=(d+t)*PI; el.laser.textContent=`القيمة المستخدمة في ماكينة الليزر: ${fmt(laserVal,1)} mm
+(سماكة الفضة: ${fmt(t,2)} mm)`; }
 
-  // initialize UI
-  updateDisplay();
-</script>
+    // ربط الأحداث
+    el.us.addEventListener('input', handleUS); el.uk.addEventListener('input', handleUK); el.fr.addEventListener('input', handleFR); el.jp.addEventListener('input', handleJP); el.diameter.addEventListener('input', handleDiameter); el.circ.addEventListener('input', handleCirc);
+    el.slider.addEventListener('input', handleSlider); el.thickness.addEventListener('change', handleThickness);
+    el.calibSlider.addEventListener('input', applyCalibration); el.calibRefMm.addEventListener('input', applyCalibration);
 
+    // بدء افتراضي
+    applyCalibration(); updateAllFromUS(8);
+  </script>
 </body>
 </html>
