@@ -167,8 +167,8 @@
     <div class="card">
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
-        <b>1)</b> اضغط<b> “بدء المعايرة”.</b><br>
-        <b>2)</b> ضع <b> “البطاقه البنكيه او بطاقه الهويه”.</b> بالعرض، على الشاشة.<br>
+        <b>1)</b> اضغط “بدء المعايرة”.<br>
+        <b>2)</b> ضع البطاقة بالعرض، نصفها داخل الشاشة.<br>
         <b>3)</b> طابق نصف البطاقة مع المربع الأبيض.<br>
         <b>4)</b> حرّك السلايدر حتى يتطابق الحجم تمامًا.<br>
         <b>5)</b> اضغط حفظ وإغلاق.<br>
@@ -179,16 +179,16 @@
 
     <div class="grid">
 
-      <!-- 🔥 الإرشادات المضافة (كما طلبت) -->
+      <!-- إرشادات معرفة المقاس -->
       <div class="card" style="background:#fffdfa;border:1px solid #f0d9b8">
         <h3 style="margin-top:0;font-size:18px;font-weight:800;color:var(--ink)">🔎 إرشادات معرفة المقاس</h3>
 
         <div style="font-size:14.5px;line-height:1.8;color:var(--muted)">
-          • بعد المعايرة .<br>
-          • ضع خاتمك فوق الدائرة الداخلية.<br>
-          • إذا طابقت الدائرة خاتمك ⬅ هذا مقاسك.<br>
-          • إذا كانت صغيرة ⬅ ارفع المقاس قليلًا.<br>
-          • إذا كانت كبيرة ⬅ انزل المقاس قليلًا.<br>
+          • بعد المعايرة، الخاتم يُعرض بالحجم الحقيقي 100٪.<br>
+          • ضع الخاتم أو إصبعك فوق الدائرة الداخلية في الرسم.<br>
+          • إذا طابقت الدائرة الداخلية الخاتم → هذا مقاسك.<br>
+          • إذا كانت أصغر من الخاتم → ارفع المقاس قليلًا.<br>
+          • إذا كانت أكبر من الخاتم → انزل المقاس قليلًا.<br>
         </div>
       </div>
 
@@ -213,11 +213,11 @@
       <div class="card">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
-          <div><label>US</label><input id="us" inputmode="decimal"></div>
-          <div><label>UK</label><input id="uk"></div>
-          <div><label>FR</label><input id="fr" inputmode="decimal"></div>
-          <div><label>JP</label><input id="jp" inputmode="decimal"></div>
-          <div><label>القطر (mm)</label><input id="diameter" inputmode="decimal"></div>
+          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal"></div>
+          <div><label>المقاس البريطاني (UK)</label><input id="uk"></div>
+          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"></div>
+          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"></div>
+          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"></div>
           <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"></div>
 
           <div id="error" style="color:var(--danger);font-weight:bold"></div>
@@ -275,7 +275,7 @@ let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor
 let pxPerMM     = scaleFactor;
 
 function updateCardBoxFromSlider(){
-  const fullLongPx = parseFloat(calibSlider.value);
+  const fullLongPx  = parseFloat(calibSlider.value);
   const fullShortPx = fullLongPx * CARD_RATIO;
 
   cardBox.style.width  = fullLongPx  + "px";
@@ -296,8 +296,8 @@ function updateCardBoxFromSlider(){
 startCalib.addEventListener("click", ()=>{
   const maxPx = Math.round(window.innerWidth * 2.0);
 
-  calibSlider.min = 140;
-  calibSlider.max = maxPx;
+  calibSlider.min   = 140;
+  calibSlider.max   = maxPx;
   calibSlider.value = Math.round((140 + maxPx) / 2);
 
   updateCardBoxFromSlider();
@@ -332,10 +332,10 @@ const diameterToCirc = d  => PI * d;
 const usToJP         = us => us + 12;
 
 const UK_STEPS = [
-"H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
-"N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
-"T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
-"Z","Z+½","Z+1"
+  "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
+  "N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
+  "T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
+  "Z","Z+½","Z+1"
 ];
 
 const usToUK = (us)=>{
@@ -363,14 +363,25 @@ let updating = false;
 
 const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
 
+/* ✅ هنا التعديل المهم: الدائرة الداخلية = القطر الحقيقي */
 function drawRing(diameterMM){
-  const rPx = (diameterMM/2) * pxPerMM;
-  el.outer.setAttribute('r', rPx);
-  el.inner.setAttribute('r', rPx/1.7);
+  const cx = 180, cy = 190;
 
-  const cx=180, cy=190;
-  const dy=cy-rPx-20;
+  // نصف القطر الحقيقي بالـ px (الداخلي)
+  const innerR = (diameterMM / 2) * pxPerMM;
 
+  // سماكة الخاتم (شكل فقط) مثلاً 6px
+  const bandThickness = 6;
+  const outerR = innerR + bandThickness;
+
+  // الدائرة الداخلية = القطر الحقيقي
+  el.inner.setAttribute('r', innerR);
+
+  // الدائرة الخارجية أكبر بشوي كإطار
+  el.outer.setAttribute('r', outerR);
+
+  // نحط الألماسة فوق الخاتم عند الحافة الخارجية
+  const dy = cy - outerR - 20;
   el.diamond.setAttribute('points',
     `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
   );
@@ -423,4 +434,3 @@ updateAllFromUS(8);
 
 </body>
 </html>
-
