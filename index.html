@@ -287,18 +287,24 @@
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
     let pxPerMM     = scaleFactor; // تُستخدم في رسم الخاتم
 
-    function updateCardBoxFromSlider(){
-      const wPx = parseFloat(calibSlider.value);         // يمثل عرض البطاقة بالبكسل
-      const hPx = wPx * CARD_RATIO;                      // ارتفاع بنفس نسبة البطاقة الحقيقية
+   function updateCardBoxFromSlider(){
+  const wPx = parseFloat(calibSlider.value);
+  const hPx = wPx * CARD_RATIO;
 
-      cardBox.style.width  = wPx + "px";
-      cardBox.style.height = hPx + "px";
+  // حجم البطاقة
+  cardBox.style.width  = wPx + "px";
+  cardBox.style.height = hPx + "px";
 
-      // نجعل مركز البطاقة على حافة يمين الـ viewport ليظهر نصفها فقط
-      cardBox.style.right = -(wPx / 2) + "px";
-      cardBox.style.top   = "50%";
-      cardBox.style.transform = "translateY(-50%)";
-    }
+  // نصف البطاقة داخل — نصفها خارج
+  cardBox.style.right = -(wPx / 2) + "px";
+  cardBox.style.top   = "50%";
+  cardBox.style.transform = "translateY(-50%)";
+
+  // 🔥 أهم تعديل:
+  // نخلي ارتفاع منطقة الحافة (viewport) = ارتفاع البطاقة
+  cardViewport.style.height = hPx + "px";
+}
+
 
     startCalib.addEventListener("click", ()=>{
       // مدى السلايدر: يكفي لتغطية الأحجام المتوقعة للبطاقة
@@ -466,3 +472,4 @@
   </script>
 </body>
 </html>
+
