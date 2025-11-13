@@ -20,6 +20,7 @@
       --accent-2:#d4af37;
       --danger:#c81e1e;
       --navy:#001f3f;
+      --salsa:#3e000c; /* اللون العنابي */
     }
 
     *{box-sizing:border-box}
@@ -27,6 +28,7 @@
 
     .wrap{max-width:1100px;margin:24px auto;padding:16px}
     .title{font-size:28px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
+    .subtitle{color:var(--muted);margin-bottom:18px;font-size:17px}
 
     .card{
       background:var(--card);
@@ -36,6 +38,17 @@
       margin-bottom:18px;
     }
 
+    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px;}
+    input{
+      width:100%;padding:10px 12px;border:1px solid var(--border);
+      border-radius:12px;font-size:16px;background:white;color:var(--ink)
+    }
+    input:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(212,175,55,.2)
+    }
+
+    .hint{font-size:13px;color:var(--muted);margin-top:8px}
     .step-box{
       background:white;padding:14px;border-radius:12px;border:1px solid var(--border);
       margin-top:8px;font-size:15px;line-height:1.7;
@@ -43,54 +56,57 @@
 
     /* شاشة المعايرة */
     #calibrationScreen{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
-      backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999;
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.75);
+      backdrop-filter:blur(4px);
+      padding:25px;
+      color:white;
+      text-align:center;
+      z-index:9999;
       overflow-y:auto;
     }
 
     #cardBox{
-      width:40px;
-      height:110px;
+      width:50px;
+      height:120px;
       background:white;
       margin:20px auto;
       border-radius:8px;
-      border:3px solid var(--ink); /* إطار عنابي */
+      border:4px solid var(--salsa);
+      transform-origin:center center!important;
     }
 
     input[type=range]{
       appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;
+      margin-top:15px;
     }
     input[type=range]::-webkit-slider-thumb{
       appearance:none;width:20px;height:20px;border-radius:50%;
       background:var(--accent-2);border:2px solid white;
     }
 
-    svg{max-width:380px;height:auto;margin:auto;display:block}
+    /* الرسم */
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
-    /* الإطار العَنَابي للدائرة */
+    svg{max-width:380px;height:auto;margin:auto;display:block}
     .ring-stroke{
-      stroke:var(--ink);
-      stroke-width:4;
-      fill:url(#ringFill);
+      stroke:var(--salsa);
+      stroke-width:3;
+      fill:url(#ringFill)
     }
     .ring-stroke-inner{
-      stroke:var(--ink);
+      stroke:var(--salsa);
       stroke-width:2;
-      fill:white;
+      fill:#fff
     }
-
+    .diamond{animation:sparkle 1.3s infinite}
     @keyframes sparkle{
       0%{fill:#89CFF0}
       50%{fill:#bde3fb}
       100%{fill:#89CFF0}
-    }
-    .diamond{animation:sparkle 1.3s infinite}
-
-    /* ترتيب جديد: الدائرة فوق – المقاسات تحت */
-    .flex-col{
-      display:flex;
-      flex-direction:column;
-      gap:18px;
     }
   </style>
 </head>
@@ -100,16 +116,15 @@
 
     <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
 
-    <!-- خطوات الاستخدام -->
     <div class="card">
       <h3>📘 طريقة الاستخدام</h3>
 
       <div class="step-box">
-        <b>1)</b> اضغط على <b>بدء المعايرة</b>.<br>
+        <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
         <b>2)</b> ضع بطاقة البنك بشكل طولي على الشاشة.<br>
-        <b>3)</b> طابق الصندوق الأبيض مع طول البطاقة تمامًا.<br>
-        <b>4)</b> اضغط <b>حفظ وإغلاق</b>.<br><br>
-        بعدها ستظهر الدائرة بالحجم الحقيقي 100٪ 🔥💛
+        <b>3)</b> حرّك السلايدر حتى يصبح الصندوق بنفس طول البطاقة.<br>
+        <b>4)</b> اضغط <b>“حفظ وإغلاق”</b>.<br>
+        بعدها سيظهر الخاتم بالحجم الحقيقي 100٪ 🙌💛
       </div>
 
       <button id="startCalib"
@@ -121,11 +136,24 @@
       <div id="calibStatus" class="hint">لم تتم المعايرة بعد</div>
     </div>
 
+    <!-- المحتوى الأساسي -->
+    <div class="grid">
 
-    <!-- ترتيب جديد: الدائرة فوق – المقاسات تحت -->
-    <div class="flex-col">
+      <div class="card">
+        <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
-      <!-- الدائرة -->
+          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal" /></div>
+          <div><label>المقاس البريطاني (UK)</label><input id="uk" /></div>
+          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"/></div>
+          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"/></div>
+          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"/></div>
+          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
+
+          <div id="error" style="color:var(--danger);font-weight:700"></div>
+          <div id="laser" style="color:var(--navy);font-weight:700"></div>
+        </div>
+      </div>
+
       <div class="card">
         <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
           المقاس الحالي: — (US)
@@ -149,24 +177,7 @@
         </svg>
 
         <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
-      </div>
-
-      <!-- المقاسات (تحت الدائرة الآن) -->
-      <div class="card">
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-
-          <div><label>US</label><input id="us" inputmode="decimal" /></div>
-          <div><label>UK</label><input id="uk" /></div>
-          <div><label>FR (mm)</label><input id="fr" inputmode="decimal"/></div>
-          <div><label>JP</label><input id="jp" inputmode="decimal"/></div>
-          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"/></div>
-          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
-
-          <div id="error" style="color:var(--danger);font-weight:700"></div>
-          <div id="laser" style="color:var(--navy);font-weight:700"></div>
-        </div>
-
+        <div class="hint">اسحب الشريط أو غيّر أي خانة بالأعلى</div>
       </div>
 
     </div>
@@ -175,7 +186,7 @@
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>طابق طول البطاقة مع الصندوق الأبيض تمامًا 👇</p>
+    <p>طابق طول البطاقة مع الصندوق الأبيض تماماً 👇</p>
 
     <div id="cardBox"></div>
 
@@ -189,8 +200,7 @@
   </div>
 
   <script>
-
-    /* المعايرة */
+    /* عناصر المعايرة */
     const calibScreen  = document.getElementById("calibrationScreen");
     const calibSlider  = document.getElementById("calibSlider");
     const cardBox      = document.getElementById("cardBox");
@@ -200,6 +210,7 @@
 
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
 
+    /* تحديث حجم البطاقة */
     function updateCardBoxFromSlider(){
       const hPx = parseFloat(calibSlider.value);
       const ratio = 53.98 / 85.6;
@@ -208,17 +219,25 @@
       cardBox.style.width  = (hPx * ratio) + "px";
     }
 
-    startCalib.addEventListener("click", ()=>{
-      calibSlider.min = 60;
-      calibSlider.max = window.innerHeight * 0.9;
+    /* فتح المعايرة */
+    startCalib.addEventListener("click", () => {
+
+      calibSlider.min  = 80;
+      calibSlider.max  = window.innerHeight * 0.8;
       calibSlider.value = 120;
 
       updateCardBoxFromSlider();
+
       calibScreen.style.display = "block";
+
+      setTimeout(() => {
+        cardBox.scrollIntoView({behavior:"smooth",block:"center"});
+      }, 150);
     });
 
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
+    /* حفظ المعايرة */
     doneCalib.addEventListener("click", ()=>{
       const px     = parseFloat(calibSlider.value);
       const realMM = 85.6;
@@ -251,7 +270,7 @@
       "Z","Z+½","Z+1"
     ];
 
-    const usToUK = (us)=>{
+    const usToUK = us => {
       const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
       return UK_STEPS[Math.round(Math.max(0,Math.min(idx,UK_STEPS.length-1)))];
     };
@@ -334,7 +353,6 @@
     el.slider.addEventListener('input',()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
     updateAllFromUS(8);
-
   </script>
 </body>
 </html>
