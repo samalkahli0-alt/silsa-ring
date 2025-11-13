@@ -60,20 +60,26 @@
       z-index:9999;
     }
 
-    #calibrationScreen h2{margin-top:0}
-
-    /* الحافة اللي كأنها طرف الشاشة */
-    #calibrationEdge{
-      position:relative;
-      width:60vw;          /* عرض منطقة المعايرة نفسها */
-      max-width:500px;
-      height:120px;
-      margin:18px 0 10px auto; /* auto يسحبها للطرف اليمين (rtl) */
-      border-right:3px solid #ffffffaa; /* يمثل حافة الشاشة */
-      overflow:hidden;     /* يخفي نص الكرت اللي برا */
+    #edgeHint{
+      text-align:right;
+      margin-right:20px;
+      font-size:14px;
+      color:#ffffffd9;
+      margin-bottom:12px;
     }
 
-    /* المربع (الكرت) */
+    /* منطقة الحافة */
+    #calibrationEdge{
+      position:relative;
+      width:75vw;
+      max-width:500px;
+      height:140px;
+      margin:0 0 15px auto; /* يدفعها للطرف اليمين */
+      border-right:3px solid #ffffffaa; /* حافة الجهاز */
+      overflow:hidden; /* لإخفاء نصف الكرت */
+    }
+
+    /* الكرت نفسه */
     #cardBox{
       position:absolute;
       top:50%;
@@ -81,17 +87,10 @@
       background:white;
       border:4px solid #3e000c;
       border-radius:10px;
-      box-shadow:0 0 10px rgba(0,0,0,.35);
+      box-shadow:0 0 12px rgba(0,0,0,.35);
     }
 
-    /* نص إرشادي فوق الحافة */
-    #edgeHint{
-      text-align:right;
-      margin-right:calc(20vw);
-      font-size:14px;
-      color:#f5f5f5;
-    }
-
+    /* السلايدر */
     #calibSlider{
       appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;
     }
@@ -146,7 +145,7 @@
       <div class="step-box">
         <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
         <b>2)</b> ضع البطاقة بشكل عرضي، نصفها على الشاشة ونصفها خارج الجهاز.<br>
-        <b>3)</b> طابق عرض الجزء الظاهر من البطاقة مع المستطيل على الشاشة.<br>
+        <b>3)</b> طابق الجزء الظاهر من البطاقة مع المستطيل.<br>
         <b>4)</b> اضغط حفظ وإغلاق.<br><br>
         بعدها يظهر الخاتم بالحجم الحقيقي 🙌💛
       </div>
@@ -196,10 +195,11 @@
 
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
-    <h2>🔧 المعايرة</h2>
-    <p>ضع البطاقة بشكل عرضي بحيث يكون نصفها على الشاشة ونصفها خارج الجهاز، ثم اضبط المستطيل.</p>
 
-    <div id="edgeHint">هذه هي حافة الشاشة، طابق حافة البطاقة معها 👇</div>
+    <h2>🔧 المعايرة</h2>
+    <p>طابق الجزء الظاهر من البطاقة مع المستطيل:</p>
+
+    <div id="edgeHint">← ضع البطاقة هنا</div>
 
     <div id="calibrationEdge">
       <div id="cardBox"></div>
@@ -212,46 +212,51 @@
       background:var(--accent);color:white;border:none;font-size:17px;width:100%">
       حفظ وإغلاق
     </button>
+
   </div>
 
   <script>
-    /* عناصر المعايرة */
-    const calibScreen  = document.getElementById("calibrationScreen");
-    const calibSlider  = document.getElementById("calibSlider");
-    const cardBox      = document.getElementById("cardBox");
-    const startCalib   = document.getElementById("startCalib");
-    const doneCalib    = document.getElementById("doneCalib");
-    const calibStatus  = document.getElementById("calibStatus");
 
-    /* scaleFactor = كم بكسل لكل 1mm */
+    /**********************************
+     *   إعدادات المعايرة (85.6mm)
+     **********************************/
+    const CARD_LONG_MM = 85.6;      // طول البطاقة الحقيقي
+    const CARD_SHORT_MM = 53.98;    // عرض البطاقة الحقيقي
+    const CARD_RATIO = CARD_SHORT_MM / CARD_LONG_MM; // نسبة الطول إلى العرض
+
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
+    let pxPerMM = scaleFactor;
 
-    /* نسبة الطول إلى العرض الحقيقية للبطاقة (الضلع القصير / الطويل) */
-    const CARD_LONG_MM  = 85.6;   // الطول الحقيقي بالمليمتر
-    const CARD_SHORT_MM = 53.98;  // العرض الحقيقي بالمليمتر
-    const CARD_RATIO    = CARD_SHORT_MM / CARD_LONG_MM; // الارتفاع = العرض * ratio
+    const calibScreen = document.getElementById("calibrationScreen");
+    const calibSlider = document.getElementById("calibSlider");
+    const cardBox = document.getElementById("cardBox");
+    const startCalib = document.getElementById("startCalib");
+    const doneCalib = document.getElementById("doneCalib");
+    const calibStatus = document.getElementById("calibStatus");
 
-    /* تحديث المربع: يحافظ على النسبة + يحركه بحيث نصفه خارج */
+    /**********************************
+     *   تحديث شكل البطاقة (نسبة وتناسب)
+     **********************************/
     function updateCardBox(){
-      const fullWidthPx = parseFloat(calibSlider.value);   // يمثل طول البطاقة بالكامل بالبكسل
-
+      const fullWidthPx = parseFloat(calibSlider.value);
       const fullHeightPx = fullWidthPx * CARD_RATIO;
 
-      cardBox.style.width  = fullWidthPx + "px";
+      cardBox.style.width = fullWidthPx + "px";
       cardBox.style.height = fullHeightPx + "px";
 
-      // نخلي نصف الكرت خارج حافة الشاشة (من اليمين) ونصفه ظاهر
+      /* نصف البطاقة خارج الشاشة */
       cardBox.style.right = -(fullWidthPx / 2) + "px";
     }
 
-    /* بدء المعايرة */
+    /**********************************
+     *   بدء المعايرة
+     **********************************/
     startCalib.addEventListener("click", ()=>{
-      // نخلي المدى واسع عشان يغطي كل الأحجام المتوقعه
-      const maxPx = Math.round(window.innerWidth * 2.2); // ممكن يكون أكبر من عرض الشاشة لأنه نصفه خارج
+      const maxPx = Math.round(window.innerWidth * 2.5);
 
-      calibSlider.min   = 80;   // بداية صغيرة
+      calibSlider.min   = 90;
       calibSlider.max   = maxPx;
-      calibSlider.value = 140;  // حجم مبدئي معقول
+      calibSlider.value = 150;
 
       updateCardBox();
       calibScreen.style.display = "block";
@@ -259,14 +264,13 @@
 
     calibSlider.addEventListener("input", updateCardBox);
 
-    /* حفظ المعايرة */
+    /**********************************
+     *   حفظ المعايرة
+     **********************************/
     doneCalib.addEventListener("click", ()=>{
-      const fullWidthPx = parseFloat(calibSlider.value);
+      const px = parseFloat(calibSlider.value);
 
-      // نستخدم الطول الحقيقي للبطاقة (85.6mm)
-      const realMM = CARD_LONG_MM;
-
-      scaleFactor = fullWidthPx / realMM;   // كم بكسل لكل 1mm
+      scaleFactor = px / CARD_LONG_MM;
       localStorage.setItem("scaleFactor", scaleFactor);
 
       calibStatus.textContent = "✔ تمت المعايرة بنجاح";
@@ -274,13 +278,12 @@
 
       calibScreen.style.display = "none";
 
-      // نحدّث القيمة المستخدمة في رسم الخاتم
       pxPerMM = scaleFactor;
     });
 
-    /* محاكاة المقاسات / الخاتم */
-    let pxPerMM = scaleFactor;
-
+    /**********************************
+     *   محاكاة المقاسات
+     **********************************/
     const PI = Math.PI;
     const US_MIN = 4, US_MAX = 14;
 
@@ -289,27 +292,27 @@
     const diameterToCirc= d  => PI * d;
     const usToJP        = us => us + 12;
 
-    const UK_STEPS = [
+    const UK_STEPS=[
       "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
       "N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
       "T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
       "Z","Z+½","Z+1"
     ];
 
-    const usToUK = (us)=>{
+    const usToUK = us=>{
       const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
       return UK_STEPS[Math.round(Math.min(Math.max(idx,0),UK_STEPS.length-1))];
     };
 
-    const normalizeUK = s => s.trim().toUpperCase().replace("1/2","½");
-    const ukToUs = uk => {
+    const normalizeUK = s=>s.trim().toUpperCase().replace("1/2","½");
+    const ukToUs = uk=>{
       const i = UK_STEPS.indexOf(normalizeUK(uk));
       if(i<0) return null;
       return US_MIN + (i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
     };
 
-    const $ = id => document.getElementById(id);
-    const el = {
+    const $=id=>document.getElementById(id);
+    const el={
       us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"),
       diameter:$("diameter"), circ:$("circ"),
       error:$("error"), laser:$("laser"),
@@ -363,11 +366,11 @@
       el.laser.textContent = `القيمة المطلوبة للماكينة: ${fmt(c,1)} mm`;
     }
 
-    const tryNum = v =>{
+    const tryNum=v=>{
       if(!v) return null;
-      v = (""+v).trim();
-      const n = Number(v);
-      return Number.isFinite(n) ? n : null;
+      v=(""+v).trim();
+      const n=Number(v);
+      return Number.isFinite(n)?n:null;
     };
 
     el.us.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n)});
@@ -378,8 +381,8 @@
     el.circ.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
     el.slider.addEventListener('input',()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
-    // قيمة ابتدائية للمقاس
     updateAllFromUS(8);
+
   </script>
 
 </body>
