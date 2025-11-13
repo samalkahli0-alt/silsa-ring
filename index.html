@@ -12,7 +12,7 @@
   <style>
     :root{
       --bg:#ffeed3;
-      --ink:#3e000c;
+      --ink:#3e000c;     /* عنابي */
       --muted:#7e4a55;
       --card:#fff7ea;
       --border:#f1d7b8;
@@ -37,17 +37,6 @@
       margin-bottom:18px;
     }
 
-    label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px;}
-    input,select{
-      width:100%;padding:10px 12px;border:1px solid var(--border);
-      border-radius:12px;font-size:16px;background:white;color:var(--ink)
-    }
-    input:focus,select:focus{
-      border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(212,175,55,.2)
-    }
-
-    .hint{font-size:13px;color:var(--muted);margin-top:8px}
     .step-box{
       background:white;padding:14px;border-radius:12px;border:1px solid var(--border);
       margin-top:8px;font-size:15px;line-height:1.7;
@@ -56,19 +45,17 @@
     /* شاشة المعايرة */
     #calibrationScreen{
       display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
-      backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999
+      backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999;
+      overflow-y:auto;
     }
 
-    /* مربع البطاقة */
     #cardBox{
-      width:60px;
-      height:160px;
+      width:40px;
+      height:110px;
       background:white;
       margin:20px auto;
       border-radius:8px;
-
-      /* 🔥 إضافة الإطار العنبـي */
-      border:3px solid #3e000c;
+      border:3px solid var(--ink); /* إطار عنابي */
     }
 
     input[type=range]{
@@ -79,18 +66,30 @@
       background:var(--accent-2);border:2px solid white;
     }
 
+    /* الرسم */
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
     @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
     svg{max-width:380px;height:auto;margin:auto;display:block}
-    .ring-stroke{stroke:url(#ringGrad);stroke-width:12;fill:url(#ringFill)}
-    .ring-stroke-inner{stroke:url(#innerGrad);stroke-width:4;fill:#fff}
-    .diamond{animation:sparkle 1.3s infinite}
+
+    /* إضافة إطار عنابي للدائرة */
+    .ring-stroke{
+      stroke:var(--ink);
+      stroke-width:4;
+      fill:url(#ringFill);
+    }
+    .ring-stroke-inner{
+      stroke:var(--ink);
+      stroke-width:2;
+      fill:white;
+    }
+
     @keyframes sparkle{
       0%{fill:#89CFF0}
       50%{fill:#bde3fb}
       100%{fill:#89CFF0}
     }
+    .diamond{animation:sparkle 1.3s infinite}
   </style>
 </head>
 
@@ -99,21 +98,20 @@
 
     <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
 
+    <!-- التعليمات الجديدة -->
     <div class="card">
       <h3>📘 طريقة الاستخدام (خطوات سهلة جداً)</h3>
 
       <div class="step-box">
-        <b>1)</b> اختر نوع جوالك من القائمة (آيفون – سامسونج – هواوي – أوبو – هونر).<br>
-        <b>2)</b> اختر موديل جهازك بالضبط.<br>
-        <b>3)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>4)</b> ضع بطاقة البنك بشكل طولي على شاشة الجوال.<br>
-        <b>5)</b> حرّك السلايدر حتى يصبح الصندوق الأبيض نفس طول البطاقة تماماً.<br>
-        <b>6)</b> اضغط <b>“حفظ وإغلاق”</b>.<br>
+        <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
+        <b>2)</b> ضع بطاقة البنك بشكل طولي على شاشة الجوال.<br>
+        <b>3)</b> حرّك السلايدر حتى يصبح الصندوق بنفس طول البطاقة.<br>
+        <b>4)</b> اضغط <b>“حفظ وإغلاق”</b>.<br><br>
         بعدها سيظهر الخاتم بالحجم الحقيقي 100٪ على شاشتك 🙌💛
       </div>
     </div>
 
-    <!-- اختيار الجهاز -->
+    <!-- اختيار الجهاز (يبقى لكن بدون ذكره في الخطوات) -->
     <div class="card">
       <h3>🔧 اختيار جهازك</h3>
 
@@ -161,17 +159,6 @@
 
         <svg id="ringSvg" viewBox="0 0 360 360">
           <defs>
-            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#d9d9d9"/>
-              <stop offset="50%" stop-color="#f3f3f3"/>
-              <stop offset="100%" stop-color="#c6c6c6"/>
-            </linearGradient>
-
-            <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#eee"/>
-              <stop offset="100%" stop-color="#fafafa"/>
-            </linearGradient>
-
             <radialGradient id="ringFill" cx="50%" cy="40%" r="65%">
               <stop offset="0%" stop-color="#ffffff"/>
               <stop offset="60%" stop-color="#f7f7f7"/>
@@ -197,11 +184,11 @@
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>ضع بطاقة البنك بشكل طولي على الشاشة ثم كبر/صغر الصندوق ليطابق طول البطاقة تماماً.</p>
+    <p>ضع بطاقة البنك على الشاشة وطابق طول الصندوق معها تماماً.</p>
 
     <div id="cardBox"></div>
 
-    <input type="range" id="calibSlider" min="80" max="350" value="180">
+    <input type="range" id="calibSlider" min="60" max="350" value="120">
 
     <button id="doneCalib"
       style="margin-top:20px;padding:12px;border-radius:12px;
@@ -211,7 +198,8 @@
   </div>
 
   <script>
-    /* 1) تحميل الأجهزة من devices.json */
+
+    /* تحميل الأجهزة */
     fetch("data/devices.json")
       .then(res => res.json())
       .then(devices => initDeviceSelector(devices));
@@ -257,29 +245,23 @@
       });
     }
 
-    /* تحديث مربع البطاقة */
     function updateCardBoxFromSlider(){
       const hPx = parseFloat(calibSlider.value);
       const ratio = 53.98 / 85.6;
+
       cardBox.style.height = hPx + "px";
       cardBox.style.width  = (hPx * ratio) + "px";
     }
 
-    /* بدء المعايرة */
     startCalib.addEventListener("click", ()=>{
       if(!selectedDevice){
         alert("اختر الشركة والموديل أولاً");
         return;
       }
 
-      const maxPx = Math.round(window.innerHeight * 0.9);
-      const minPx = Math.round(maxPx * 0.2);
-
-      calibSlider.min = minPx;
-      calibSlider.max = maxPx;
-
-      /* 🔥 هنا التعديل المهم: بداية قريبة جداً من حجم البطاقة الطبيعي */
-      calibSlider.value = Math.round(86 * scaleFactor);
+      calibSlider.min = 70;
+      calibSlider.max = window.innerHeight * 0.9;
+      calibSlider.value = 110;
 
       updateCardBoxFromSlider();
       calibScreen.style.display = "block";
@@ -287,9 +269,8 @@
 
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
-    /* حفظ */
     doneCalib.addEventListener("click", ()=>{
-      const px = parseFloat(calibSlider.value);
+      const px     = parseFloat(calibSlider.value);
       const realMM = 85.6;
 
       scaleFactor = px / realMM;
@@ -299,10 +280,10 @@
       calibStatus.style.color = "green";
 
       calibScreen.style.display = "none";
-
       pxPerMM = scaleFactor;
     });
 
+    /* محاكاة المقاس */
     let pxPerMM = scaleFactor;
 
     const PI = Math.PI; 
@@ -403,6 +384,7 @@
     el.slider.addEventListener('input',()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
     updateAllFromUS(8);
+
   </script>
 </body>
 </html>
