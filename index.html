@@ -115,7 +115,7 @@
       gap:14px;
     }
 
-    /* الحاوية اللي تبين نصف البطاقة فقط */
+    /* الحاوية اللي تبين نصف الضلع الطويل فقط */
     #cardViewport{
       position:relative;
       overflow:hidden;
@@ -177,8 +177,8 @@
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
         <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>2)</b> ضع البطاقة بشكل عرضي على شاشة الجوال، بحيث نصفها على الشاشة ونصفها خارجها.<br>
-        <b>3)</b> حط نص البطاقة على المربع الأبيض تماماً.<br>
+        <b>2)</b> ضع البطاقة بشكل عرضي على شاشة الجوال، بحيث <b>الضلع الطويل</b> نصه على الشاشة ونصه خارجها.<br>
+        <b>3)</b> حط نص الضلع الطويل على المربع الأبيض تماماً.<br>
         <b>4)</b> حرّك السلايدر حتى يكون المربع نفس نص البطاقة بالحجم الحقيقي.<br>
         <b>5)</b> اضغط حفظ وإغلاق.<br><br>
         بعدها يظهر الخاتم بالحجم الحقيقي 🙌💛
@@ -230,11 +230,11 @@
   <div id="calibrationScreen">
     <div id="calibCard">
       <h2>🔧 المعايرة</h2>
-      <p>طابق المستطيل مع <b>نصف عرض البطاقة</b> وهي بالعرض على الشاشة.</p>
+      <p>طابق المستطيل مع <b>نصف الضلع الطويل للبطاقة</b> وهي بالعرض على الشاشة.</p>
 
       <div id="calibrationRow">
 
-        <!-- المربع اللي يمثل نصف البطاقة الظاهر -->
+        <!-- المربع اللي يمثل نصف الضلع الطويل الظاهر -->
         <div id="cardViewport">
           <div id="cardBox"></div>
           <div id="halfLine"></div>
@@ -242,8 +242,8 @@
 
         <!-- النص + السهم بجانب المربع -->
         <div id="hintBox">
-          <span>ضع البطاقة هنا بحيث نصفها على الشاشة</span>
-          <span class="arrow">→</span>
+          <span>ضع البطاقة هنا بحيث نصف الضلع الطويل على الشاشة</span>
+          <span class="arrow">←</span>
         </div>
       </div>
 
@@ -258,7 +258,7 @@
   </div>
 
   <script>
-    /************* معايرة البطاقة (نص العرض) *************/
+    /************* معايرة البطاقة (نصف الضلع الطويل) *************/
     const calibScreen  = document.getElementById("calibrationScreen");
     const calibSlider  = document.getElementById("calibSlider");
     const cardBox      = document.getElementById("cardBox");
@@ -268,43 +268,46 @@
     const doneCalib    = document.getElementById("doneCalib");
     const calibStatus  = document.getElementById("calibStatus");
 
-    // ✅ الآن المعايرة على "عرض" البطاقة الحقيقي = 53.98mm
-    const CARD_WIDTH_MM  = 53.98; // العرض الحقيقي
-    const CARD_HEIGHT_MM = 85.6;  // الطول الحقيقي
-    const CARD_RATIO     = CARD_HEIGHT_MM / CARD_WIDTH_MM; // الطول/العرض
+    // ✅ هنا البطاقة أفقية:
+    // الضلع الطويل = 85.6mm (أفقي على الشاشة)
+    // الضلع القصير = 53.98mm (ارتفاع)
+    const CARD_LONG_MM  = 85.6;
+    const CARD_SHORT_MM = 53.98;
+    const CARD_RATIO    = CARD_SHORT_MM / CARD_LONG_MM; // ارتفاع / طول
 
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
     let pxPerMM     = scaleFactor;
 
     function updateCardBoxFromSlider(){
-      const fullWidthPx  = parseFloat(calibSlider.value);     // يمثل "عرض البطاقة" بالبكسل
-      const fullHeightPx = fullWidthPx * CARD_RATIO;          // الطول بنفس النسبة الحقيقية
+      // هذا يمثّل "الضلع الطويل كامل" على الشاشة بالبكسل
+      const fullLongPx   = parseFloat(calibSlider.value);
+      const fullShortPx  = fullLongPx * CARD_RATIO; // ارتفاع بنفس نسبة البطاقة الحقيقية
 
-      // حجم البطاقة كامل (لكن بنشتغل على نص العرض في الحاوية)
-      cardBox.style.width  = fullWidthPx + "px";
-      cardBox.style.height = fullHeightPx + "px";
+      // حجم البطاقة كامل
+      cardBox.style.width  = fullLongPx  + "px"; // الضلع الطويل
+      cardBox.style.height = fullShortPx + "px"; // الضلع القصير
 
-      // نخلي الحاوية تعرض نص العرض فقط
-      const halfWidthPx = fullWidthPx / 2;
-      cardViewport.style.width  = halfWidthPx + "px";
-      cardViewport.style.height = fullHeightPx + "px";
+      // الحاوية تعرض فقط نصف الضلع الطويل
+      const halfLongPx = fullLongPx / 2;
+      cardViewport.style.width  = halfLongPx + "px";
+      cardViewport.style.height = fullShortPx + "px";
 
-      // نحرك البطاقة بحيث نص عرضها ظاهر
-      cardBox.style.right = -(fullWidthPx / 2) + "px";
+      // نحرك البطاقة بحيث نص الضلع الطويل ظاهر
+      cardBox.style.right = -(fullLongPx / 2) + "px";
       cardBox.style.top   = "50%";
       cardBox.style.transform = "translateY(-50%)";
 
-      // الخط يتطابق مع طول البطاقة ويصير على حافة نصها داخل الشاشة
-      halfLine.style.height = fullHeightPx + "px";
+      // الخط يطابق ارتفاع البطاقة ويكون على حافة نصها داخل الشاشة
+      halfLine.style.height = fullShortPx + "px";
       halfLine.style.right  = "0px";
     }
 
     startCalib.addEventListener("click", ()=>{
       const maxPx = Math.round(window.innerWidth * 2.0);
 
-      calibSlider.min   = 80;
+      calibSlider.min   = 140; // بداية مقبولة
       calibSlider.max   = maxPx;
-      calibSlider.value = Math.round((80 + maxPx)/2);
+      calibSlider.value = Math.round((140 + maxPx) / 2);
 
       updateCardBoxFromSlider();
       calibScreen.style.display = "block";
@@ -313,11 +316,11 @@
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
     doneCalib.addEventListener("click", ()=>{
-      const fullWidthPx = parseFloat(calibSlider.value); // هذا يمثل عرض البطاقة على الشاشة بالبكسل
-      const realMM      = CARD_WIDTH_MM;                 // ✅ الآن نستخدم عرض البطاقة 53.98mm
+      const fullLongPx = parseFloat(calibSlider.value);
+      const realMM     = CARD_LONG_MM; // المعايرة الآن على "الضلع الطويل" 85.6mm
 
-      // px لكل 1mm من "العرض"
-      scaleFactor = fullWidthPx / realMM;
+      // px لكل 1mm من الضلع الطويل
+      scaleFactor = fullLongPx / realMM;
       pxPerMM     = scaleFactor;
       localStorage.setItem("scaleFactor", scaleFactor);
 
@@ -326,7 +329,6 @@
 
       calibScreen.style.display = "none";
 
-      // نعيد رسم الخاتم على المقاس الحالي
       const currentUS = parseFloat(document.getElementById("us").value) || 8;
       updateAllFromUS(currentUS);
     });
