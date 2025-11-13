@@ -12,7 +12,7 @@
   <style>
     :root{
       --bg:#ffeed3;
-      --ink:#3e000c;     /* عنابي */
+      --ink:#3e000c;
       --muted:#7e4a55;
       --card:#fff7ea;
       --border:#f1d7b8;
@@ -27,7 +27,6 @@
 
     .wrap{max-width:1100px;margin:24px auto;padding:16px}
     .title{font-size:28px;font-weight:800;margin:0 0 14px;display:flex;gap:10px;align-items:center}
-    .subtitle{color:var(--muted);margin-bottom:18px;font-size:17px}
 
     .card{
       background:var(--card);
@@ -66,13 +65,9 @@
       background:var(--accent-2);border:2px solid white;
     }
 
-    /* الرسم */
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    @media(max-width:900px){.grid{grid-template-columns:1fr}}
-
     svg{max-width:380px;height:auto;margin:auto;display:block}
 
-    /* إضافة إطار عنابي للدائرة */
+    /* الإطار العَنَابي للدائرة */
     .ring-stroke{
       stroke:var(--ink);
       stroke-width:4;
@@ -90,6 +85,13 @@
       100%{fill:#89CFF0}
     }
     .diamond{animation:sparkle 1.3s infinite}
+
+    /* ترتيب جديد: الدائرة فوق – المقاسات تحت */
+    .flex-col{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
   </style>
 </head>
 
@@ -98,32 +100,17 @@
 
     <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
 
-    <!-- التعليمات الجديدة -->
+    <!-- خطوات الاستخدام -->
     <div class="card">
-      <h3>📘 طريقة الاستخدام (خطوات سهلة جداً)</h3>
+      <h3>📘 طريقة الاستخدام</h3>
 
       <div class="step-box">
-        <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>2)</b> ضع بطاقة البنك بشكل طولي على شاشة الجوال.<br>
-        <b>3)</b> حرّك السلايدر حتى يصبح الصندوق بنفس طول البطاقة.<br>
-        <b>4)</b> اضغط <b>“حفظ وإغلاق”</b>.<br><br>
-        بعدها سيظهر الخاتم بالحجم الحقيقي 100٪ على شاشتك 🙌💛
+        <b>1)</b> اضغط على <b>بدء المعايرة</b>.<br>
+        <b>2)</b> ضع بطاقة البنك بشكل طولي على الشاشة.<br>
+        <b>3)</b> طابق الصندوق الأبيض مع طول البطاقة تمامًا.<br>
+        <b>4)</b> اضغط <b>حفظ وإغلاق</b>.<br><br>
+        بعدها ستظهر الدائرة بالحجم الحقيقي 100٪ 🔥💛
       </div>
-    </div>
-
-    <!-- اختيار الجهاز (يبقى لكن بدون ذكره في الخطوات) -->
-    <div class="card">
-      <h3>🔧 اختيار جهازك</h3>
-
-      <label>اختر الشركة</label>
-      <select id="brandSelect">
-        <option value="">— اختر الشركة —</option>
-      </select>
-
-      <label style="margin-top:12px">اختر الموديل</label>
-      <select id="modelSelect" disabled>
-        <option value="">— اختر الموديل —</option>
-      </select>
 
       <button id="startCalib"
         style="margin-top:14px;padding:12px;border-radius:12px;
@@ -134,24 +121,11 @@
       <div id="calibStatus" class="hint">لم تتم المعايرة بعد</div>
     </div>
 
-    <!-- المحتوى الأساسي -->
-    <div class="grid">
 
-      <div class="card">
-        <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <!-- ترتيب جديد: الدائرة فوق – المقاسات تحت -->
+    <div class="flex-col">
 
-          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal" /></div>
-          <div><label>المقاس البريطاني (UK)</label><input id="uk" /></div>
-          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"/></div>
-          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"/></div>
-          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"/></div>
-          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
-
-          <div id="error" style="color:var(--danger);font-weight:700"></div>
-          <div id="laser" style="color:var(--navy);font-weight:700"></div>
-        </div>
-      </div>
-
+      <!-- الدائرة -->
       <div class="card">
         <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
           المقاس الحالي: — (US)
@@ -175,7 +149,24 @@
         </svg>
 
         <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
-        <div class="hint">اسحب الشريط أو غيّر أي خانة بالأعلى</div>
+      </div>
+
+      <!-- المقاسات (تحت الدائرة الآن) -->
+      <div class="card">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+          <div><label>US</label><input id="us" inputmode="decimal" /></div>
+          <div><label>UK</label><input id="uk" /></div>
+          <div><label>FR (mm)</label><input id="fr" inputmode="decimal"/></div>
+          <div><label>JP</label><input id="jp" inputmode="decimal"/></div>
+          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"/></div>
+          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
+
+          <div id="error" style="color:var(--danger);font-weight:700"></div>
+          <div id="laser" style="color:var(--navy);font-weight:700"></div>
+        </div>
+
       </div>
 
     </div>
@@ -184,7 +175,7 @@
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>ضع بطاقة البنك على الشاشة وطابق طول الصندوق معها تماماً.</p>
+    <p>طابق طول البطاقة مع الصندوق الأبيض تمامًا 👇</p>
 
     <div id="cardBox"></div>
 
@@ -199,13 +190,7 @@
 
   <script>
 
-    /* تحميل الأجهزة */
-    fetch("data/devices.json")
-      .then(res => res.json())
-      .then(devices => initDeviceSelector(devices));
-
-    const brandSelect  = document.getElementById("brandSelect");
-    const modelSelect  = document.getElementById("modelSelect");
+    /* المعايرة */
     const calibScreen  = document.getElementById("calibrationScreen");
     const calibSlider  = document.getElementById("calibSlider");
     const cardBox      = document.getElementById("cardBox");
@@ -213,37 +198,7 @@
     const doneCalib    = document.getElementById("doneCalib");
     const calibStatus  = document.getElementById("calibStatus");
 
-    let selectedDevice = null;
-    let scaleFactor    = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
-
-    function initDeviceSelector(devices){
-      for(const brand of Object.keys(devices)){
-        const opt = document.createElement("option");
-        opt.value = brand;
-        opt.textContent = brand;
-        brandSelect.appendChild(opt);
-      }
-
-      brandSelect.addEventListener("change", ()=>{
-        modelSelect.innerHTML = `<option value="">— اختر الموديل —</option>`;
-        modelSelect.disabled   = true;
-
-        const brand = brandSelect.value;
-        if(!brand) return;
-
-        devices[brand].forEach(dev=>{
-          const opt = document.createElement("option");
-          opt.value = JSON.stringify(dev);
-          opt.textContent = dev.model;
-          modelSelect.appendChild(opt);
-        });
-        modelSelect.disabled = false;
-      });
-
-      modelSelect.addEventListener("change", ()=>{
-        selectedDevice = JSON.parse(modelSelect.value);
-      });
-    }
+    let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
 
     function updateCardBoxFromSlider(){
       const hPx = parseFloat(calibSlider.value);
@@ -254,14 +209,9 @@
     }
 
     startCalib.addEventListener("click", ()=>{
-      if(!selectedDevice){
-        alert("اختر الشركة والموديل أولاً");
-        return;
-      }
-
-      calibSlider.min = 70;
+      calibSlider.min = 60;
       calibSlider.max = window.innerHeight * 0.9;
-      calibSlider.value = 110;
+      calibSlider.value = 120;
 
       updateCardBoxFromSlider();
       calibScreen.style.display = "block";
