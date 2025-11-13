@@ -52,7 +52,7 @@
       display:none;
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,.78);
+      background:rgba(0,0,0,.85);
       backdrop-filter:blur(4px);
       padding:25px;
       color:white;
@@ -60,11 +60,31 @@
       z-index:9999;
     }
 
+    /* الشريط الأفقي */
+    #calibrationContainer{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      margin:20px 0;
+    }
+
+    #sideHint{
+      font-size:15px;
+      font-weight:bold;
+      color:#fff;
+      background:#3e000c;
+      padding:8px 12px;
+      border-radius:8px;
+      white-space:nowrap;
+    }
+
     #cardBox{
       background:white;
       border:4px solid #3e000c;
-      border-radius:10px;
-      margin:25px auto;
+      border-radius:8px;
+      height:40px; /* شريط رفيع */
+      width:120px;
     }
 
     #calibSlider{
@@ -101,7 +121,6 @@
       width:100%;padding:10px 12px;border:1px solid var(--border);
       border-radius:12px;font-size:16px;background:white;color:var(--ink)
     }
-
     input[type=range]{
       appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;
     }
@@ -121,16 +140,15 @@
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
         <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
-        <b>2)</b> ضع بطاقة البنك أو الهوية بشكل طولي على الشاشة.<br>
-        <b>3)</b> حرّك السلايدر حتى يصبح الصندوق مطابقًا للبطاقة.<br>
+        <b>2)</b> ضع نصف البطاقة على طرف الشاشة (عرض البطاقة فقط).<br>
+        <b>3)</b> حرّك السلايدر حتى يصبح الشريط مطابق لعرض البطاقة.<br>
         <b>4)</b> اضغط حفظ وإغلاق.<br><br>
-        بعدها سيظهر الخاتم بالحجم الحقيقي 🙌💛
+        بعدها يظهر الخاتم بالحجم الحقيقي 🙌💛
       </div>
       <button id="startCalib">بدء المعايرة</button>
       <div id="calibStatus" style="margin-top:8px;color:var(--muted)">لم تتم المعايرة بعد</div>
     </div>
 
-    <!-- تم عكس الترتيب -->
     <div class="grid">
 
       <!-- الرسم -->
@@ -174,9 +192,12 @@
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>ضع بطاقة البنك ثم اضبط الصندوق ليطابق طول البطاقة.</p>
+    <p>ضع نصف البطاقة على طرف الشاشة ثم اضبط الشريط ليطابق عرض البطاقة.</p>
 
-    <div id="cardBox"></div>
+    <div id="calibrationContainer">
+      <div id="sideHint">← ضع البطاقة هنا</div>
+      <div id="cardBox"></div>
+    </div>
 
     <input type="range" id="calibSlider">
 
@@ -189,7 +210,6 @@
 
   <script>
 
-    /* عناصر المعايرة */
     const calibScreen = document.getElementById("calibrationScreen");
     const calibSlider = document.getElementById("calibSlider");
     const cardBox = document.getElementById("cardBox");
@@ -200,23 +220,21 @@
     /* scaleFactor = px لكل 1mm */
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
 
-    /* تحديث حجم مربع البطاقة */
+    /* تحديث عرض الشريط */
     function updateCardBox(){
-      const hPx = parseFloat(calibSlider.value);
-      const ratio = 53.98 / 85.6;  
-      cardBox.style.height = hPx + "px";
-      cardBox.style.width  = (hPx * ratio) + "px";
+      const wPx = parseFloat(calibSlider.value);
+      cardBox.style.width = wPx + "px";
+      cardBox.style.height = (wPx * 0.40) + "px"; /* ارتفاع بنسبة 40% فقط */
     }
 
     /* بدء المعايرة */
     startCalib.addEventListener("click", ()=>{
 
-      // أعطي أعلى قيمة 90% من ارتفاع الشاشة
-      const maxPx = Math.round(window.innerHeight * 0.90);
+      const maxPx = Math.round(window.innerWidth * 0.95); /* على عرض الشاشة */
 
-      calibSlider.min = 40;      // صغير جدًا بالبداية
-      calibSlider.max = maxPx;   // يوصل لحجم البطاقة الحقيقي دائمًا
-      calibSlider.value = 60;    // بداية صغيرة
+      calibSlider.min = 30;
+      calibSlider.max = maxPx;
+      calibSlider.value = 60;
 
       updateCardBox();
       calibScreen.style.display = "block";
@@ -227,7 +245,9 @@
     /* حفظ المعايرة */
     doneCalib.addEventListener("click", ()=>{
       const px = parseFloat(calibSlider.value);
-      const realMM = 85.6;
+
+      /* عرض البطاقة الحقيقي 53.98mm */
+      const realMM = 53.98;
 
       scaleFactor = px / realMM;  
       localStorage.setItem("scaleFactor", scaleFactor);
@@ -239,7 +259,7 @@
       pxPerMM = scaleFactor;  
     });
 
-    /* محاكاة المقاسات */
+    /* حسابات المقاسات */
     let pxPerMM = scaleFactor;
 
     const PI = Math.PI;
@@ -248,6 +268,7 @@
     const usToDiameter = us => 11.63 + 0.8128 * us;
     const diameterToUs = d => (d - 11.63) / 0.8128;
     const diameterToCirc = d => PI * d;
+
     const usToJP = us => us + 12;
 
     const UK_STEPS=[
@@ -297,14 +318,14 @@
 
     function updateAllFromUS(us){
       if(us<US_MIN || us>US_MAX){
-        el.error.textContent="❌ المقاس خارج النطاق (4 — 14)";
+        el.error.textContent="❌ المقاس خارج المدى (4 — 14)";
         return;
       }
 
       el.error.textContent="";
 
       const d=usToDiameter(us);
-      const c=diameterToCirc(d);
+      const c=PI * d;
 
       updating=true;
       el.us.value=fmt(us,2);
@@ -319,7 +340,7 @@
       el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
 
       drawRing(d);
-      el.laser.textContent=`القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
+      el.laser.textContent=`القيمة المطلوبة للماكينة: ${fmt(c,1)} mm`;
     }
 
     const tryNum=v=>{
