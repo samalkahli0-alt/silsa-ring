@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💎 محاكاة مقاس الخاتم — سلسا</title>
+  <title>💎 محاكاة مقاس الخاتم — SILSA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,16 +53,15 @@
       margin-top:8px;font-size:15px;line-height:1.7;
     }
 
-    /* معايرة */
+    /* شاشة المعايرة */
     #calibrationScreen{
       display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
       backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999
     }
 
     #cardBox{
-      width:60px;     /* العرض */
-      height:90mm;    /* الطول الحقيقي للعملة */
-      max-height:65vh;
+      width:60px;      /* يتعدل بالجافاسكربت */
+      height:160px;    /* يتعدل بالجافاسكربت */
       background:white;
       margin:20px auto;
       border-radius:8px;
@@ -95,19 +94,19 @@
 <body>
   <div class="wrap">
 
-    <h1 class="title">💎 محاكاة مقاس الخاتم — SILSA</h1>
+    <h1 class="title">💎 محاكاة مقاس الخاتم — سلسا</h1>
 
     <div class="card">
       <h3>📘 طريقة الاستخدام (خطوات سهلة جداً)</h3>
 
       <div class="step-box">
-        <b>1) اختر نوع جوالك</b> من القائمة (آيفون – سامسونج – هواوي – أوبو – هونر).<br>
-        <b>2) اختر موديل جهازك</b> بالضبط.<br>
-        <b>3) اضغط زر “بدء المعايرة”.</b><br>
-        <b>4) ضع بطاقة البنك بشكل طولي على شاشة جوالك.</b><br>
-        <b>5) حرّك السلايدر حتى يصبح الصندوق نفس طول البطاقة تماماً.</b><br>
-        <b>6) اضغط “حفظ”.</b><br>
-        بعدها سيظهر الخاتم بالحجم الحقيقي 100% حسب شاشة جوالك 🙌💛
+        <b>1)</b> اختر نوع جوالك من القائمة (آيفون – سامسونج – هواوي – أوبو – هونر).<br>
+        <b>2)</b> اختر موديل جهازك بالضبط.<br>
+        <b>3)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
+        <b>4)</b> ضع بطاقة البنك بشكل طولي على شاشة الجوال.<br>
+        <b>5)</b> حرّك السلايدر حتى يصبح الصندوق الأبيض نفس طول البطاقة تماماً.<br>
+        <b>6)</b> اضغط <b>“حفظ وإغلاق”</b>.<br>
+        بعدها سيظهر الخاتم بالحجم الحقيقي 100٪ على شاشتك 🙌💛
       </div>
     </div>
 
@@ -140,12 +139,12 @@
       <div class="card">
         <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
-          <div><label>المقاس الأمريكي (US)</label><input id="us" /></div>
+          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal" /></div>
           <div><label>المقاس البريطاني (UK)</label><input id="uk" /></div>
-          <div><label>المقاس الفرنسي (FR)</label><input id="fr"/></div>
-          <div><label>المقاس الياباني (JP)</label><input id="jp"/></div>
-          <div><label>القطر الداخلي (mm)</label><input id="diameter"/></div>
-          <div><label>المحيط (mm)</label><input id="circ"/></div>
+          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"/></div>
+          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"/></div>
+          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"/></div>
+          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"/></div>
 
           <div id="error" style="color:var(--danger);font-weight:700"></div>
           <div id="laser" style="color:var(--navy);font-weight:700"></div>
@@ -195,7 +194,7 @@
   <!-- شاشة المعايرة -->
   <div id="calibrationScreen">
     <h2>🔧 المعايرة</h2>
-    <p>ضع بطاقة البنك بشكل طولي على الشاشة ثم كبر/صغر الصندوق ليطابق طول البطاقة.</p>
+    <p>ضع بطاقة البنك بشكل طولي على الشاشة ثم كبر/صغر الصندوق ليطابق طول البطاقة تماماً.</p>
 
     <div id="cardBox"></div>
 
@@ -209,46 +208,45 @@
   </div>
 
   <script>
-    /* تحميل الأجهزة */
+    /* 1) تحميل الأجهزة من devices.json */
     fetch("devices.json")
       .then(res => res.json())
       .then(devices => initDeviceSelector(devices));
 
-    const brandSelect = document.getElementById("brandSelect");
-    const modelSelect = document.getElementById("modelSelect");
-
-    const calibScreen = document.getElementById("calibrationScreen");
-    const calibSlider = document.getElementById("calibSlider");
-    const cardBox = document.getElementById("cardBox");
-    const startCalib = document.getElementById("startCalib");
-    const doneCalib = document.getElementById("doneCalib");
-    const calibStatus = document.getElementById("calibStatus");
+    const brandSelect  = document.getElementById("brandSelect");
+    const modelSelect  = document.getElementById("modelSelect");
+    const calibScreen  = document.getElementById("calibrationScreen");
+    const calibSlider  = document.getElementById("calibSlider");
+    const cardBox      = document.getElementById("cardBox");
+    const startCalib   = document.getElementById("startCalib");
+    const doneCalib    = document.getElementById("doneCalib");
+    const calibStatus  = document.getElementById("calibStatus");
 
     let selectedDevice = null;
-    let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
+    let scaleFactor    = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
 
     function initDeviceSelector(devices){
       for(const brand of Object.keys(devices)){
-        let opt=document.createElement("option");
-        opt.value=brand;
-        opt.textContent=brand;
+        const opt = document.createElement("option");
+        opt.value = brand;
+        opt.textContent = brand;
         brandSelect.appendChild(opt);
       }
 
       brandSelect.addEventListener("change", ()=>{
-        modelSelect.innerHTML=`<option value="">— اختر الموديل —</option>`;
-        modelSelect.disabled=true;
+        modelSelect.innerHTML = `<option value="">— اختر الموديل —</option>`;
+        modelSelect.disabled   = true;
 
-        const brand=brandSelect.value;
+        const brand = brandSelect.value;
         if(!brand) return;
 
         devices[brand].forEach(dev=>{
-          const opt=document.createElement("option");
-          opt.value=JSON.stringify(dev);
-          opt.textContent=dev.model;
+          const opt = document.createElement("option");
+          opt.value = JSON.stringify(dev);
+          opt.textContent = dev.model;
           modelSelect.appendChild(opt);
         });
-        modelSelect.disabled=false;
+        modelSelect.disabled = false;
       });
 
       modelSelect.addEventListener("change", ()=>{
@@ -256,37 +254,56 @@
       });
     }
 
-    /* المعايرة */
+    /* دالة تحديث مربع البطاقة حسب السلايدر (نسبة وتناسب) */
+    function updateCardBoxFromSlider(){
+      const hPx = parseFloat(calibSlider.value);     // طول البطاقة على الشاشة بالبكسل
+      const ratio = 53.98 / 85.6;                   // عرض / طول البطاقة الحقيقي
+      cardBox.style.height = hPx + "px";
+      cardBox.style.width  = (hPx * ratio) + "px";
+    }
+
+    /* 2) بدء المعايرة */
     startCalib.addEventListener("click", ()=>{
       if(!selectedDevice){
         alert("اختر الشركة والموديل أولاً");
         return;
       }
-      calibScreen.style.display="block";
+
+      // نحدد مدى السلايدر بناءً على ارتفاع الشاشة
+      const maxPx = Math.round(window.innerHeight * 0.9);
+      const minPx = Math.round(maxPx * 0.2);
+
+      calibSlider.min   = minPx;
+      calibSlider.max   = maxPx;
+
+      // نخلي القيمة المبدئية وسط المدى
+      calibSlider.value = Math.round((minPx + maxPx) / 2);
+      updateCardBoxFromSlider();
+
+      calibScreen.style.display = "block";
     });
 
-    calibSlider.addEventListener("input", ()=>{
-      let val=parseFloat(calibSlider.value);
-      cardBox.style.height = val + "px";      // الطول
-      cardBox.style.width = (val/1.6) + "px"; // النسبة والتناسب
-    });
+    calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
+    /* 3) حفظ المعايرة */
     doneCalib.addEventListener("click", ()=>{
-      let px = parseFloat(calibSlider.value);
-      let realMM = 85.6;  // طول البطاقة الحقيقي
+      const px     = parseFloat(calibSlider.value); // طول البطاقة على الشاشة بالبكسل
+      const realMM = 85.6;                          // طول البطاقة الحقيقي بالمليمتر (الضلع الطويل)
 
-      scaleFactor = px / realMM;
+      scaleFactor = px / realMM;                    // كم بكسل لكل 1mm
       localStorage.setItem("scaleFactor", scaleFactor);
 
       calibStatus.textContent = "✔ تمت المعايرة بنجاح";
       calibStatus.style.color = "green";
 
-      calibScreen.style.display="none";
+      calibScreen.style.display = "none";
 
+      // نحدّث القيمة المستخدمة في رسم الخاتم
       pxPerMM = scaleFactor;
     });
 
-    /* كود حساب المقاس */
+    /* 4) كود محاكاة المقاس */
+
     let pxPerMM = scaleFactor;
 
     const PI = Math.PI; 
@@ -295,7 +312,6 @@
     const usToDiameter = us => 11.63 + 0.8128 * us;
     const diameterToUs = d => (d - 11.63) / 0.8128;
     const diameterToCirc = d => PI * d;
-
     const usToJP = us => us + 12;
 
     const UK_STEPS = [
@@ -391,4 +407,3 @@
   </script>
 </body>
 </html>
-
