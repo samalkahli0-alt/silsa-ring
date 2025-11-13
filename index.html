@@ -59,12 +59,16 @@
       backdrop-filter:blur(4px);padding:25px;color:white;text-align:center;z-index:9999
     }
 
+    /* مربع البطاقة */
     #cardBox{
-      width:60px;      /* يتعدل بالجافاسكربت */
-      height:160px;    /* يتعدل بالجافاسكربت */
+      width:60px;
+      height:160px;
       background:white;
       margin:20px auto;
       border-radius:8px;
+
+      /* 🔥 إضافة الإطار العنبـي */
+      border:3px solid #3e000c;
     }
 
     input[type=range]{
@@ -75,7 +79,6 @@
       background:var(--accent-2);border:2px solid white;
     }
 
-    /* الرسم */
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
     @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
@@ -254,43 +257,42 @@
       });
     }
 
-    /* دالة تحديث مربع البطاقة حسب السلايدر (نسبة وتناسب) */
+    /* تحديث مربع البطاقة */
     function updateCardBoxFromSlider(){
-      const hPx = parseFloat(calibSlider.value);     // طول البطاقة على الشاشة بالبكسل
-      const ratio = 53.98 / 85.6;                   // عرض / طول البطاقة الحقيقي
+      const hPx = parseFloat(calibSlider.value);
+      const ratio = 53.98 / 85.6;
       cardBox.style.height = hPx + "px";
       cardBox.style.width  = (hPx * ratio) + "px";
     }
 
-    /* 2) بدء المعايرة */
+    /* بدء المعايرة */
     startCalib.addEventListener("click", ()=>{
       if(!selectedDevice){
         alert("اختر الشركة والموديل أولاً");
         return;
       }
 
-      // نحدد مدى السلايدر بناءً على ارتفاع الشاشة
       const maxPx = Math.round(window.innerHeight * 0.9);
       const minPx = Math.round(maxPx * 0.2);
 
-      calibSlider.min   = minPx;
-      calibSlider.max   = maxPx;
+      calibSlider.min = minPx;
+      calibSlider.max = maxPx;
 
-      // نخلي القيمة المبدئية وسط المدى
-      calibSlider.value = Math.round((minPx + maxPx) / 2);
+      /* 🔥 هنا التعديل المهم: بداية قريبة جداً من حجم البطاقة الطبيعي */
+      calibSlider.value = Math.round(86 * scaleFactor);
+
       updateCardBoxFromSlider();
-
       calibScreen.style.display = "block";
     });
 
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
-    /* 3) حفظ المعايرة */
+    /* حفظ */
     doneCalib.addEventListener("click", ()=>{
-      const px     = parseFloat(calibSlider.value); // طول البطاقة على الشاشة بالبكسل
-      const realMM = 85.6;                          // طول البطاقة الحقيقي بالمليمتر (الضلع الطويل)
+      const px = parseFloat(calibSlider.value);
+      const realMM = 85.6;
 
-      scaleFactor = px / realMM;                    // كم بكسل لكل 1mm
+      scaleFactor = px / realMM;
       localStorage.setItem("scaleFactor", scaleFactor);
 
       calibStatus.textContent = "✔ تمت المعايرة بنجاح";
@@ -298,11 +300,8 @@
 
       calibScreen.style.display = "none";
 
-      // نحدّث القيمة المستخدمة في رسم الخاتم
       pxPerMM = scaleFactor;
     });
-
-    /* 4) كود محاكاة المقاس */
 
     let pxPerMM = scaleFactor;
 
