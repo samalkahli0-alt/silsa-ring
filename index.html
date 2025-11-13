@@ -62,7 +62,7 @@
 
     #cardBox{
       background:white;
-      border:4px solid #3e000c;   /* إطار عنابي */
+      border:4px solid #3e000c;
       border-radius:10px;
       margin:25px auto;
     }
@@ -130,7 +130,7 @@
       <div id="calibStatus" style="margin-top:8px;color:var(--muted)">لم تتم المعايرة بعد</div>
     </div>
 
-    <!-- تم عكس الترتيب: الرسم أول – المقاسات ثاني -->
+    <!-- تم عكس الترتيب -->
     <div class="grid">
 
       <!-- الرسم -->
@@ -154,6 +154,7 @@
       <!-- المدخلات -->
       <div class="card">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
           <div><label>US</label><input id="us" inputmode="decimal"></div>
           <div><label>UK</label><input id="uk"></div>
           <div><label>FR</label><input id="fr" inputmode="decimal"></div>
@@ -163,6 +164,7 @@
 
           <div id="error" style="color:#c81e1e;font-weight:bold"></div>
           <div id="laser" style="color:#001f3f;font-weight:bold"></div>
+
         </div>
       </div>
 
@@ -187,6 +189,7 @@
 
   <script>
 
+    /* عناصر المعايرة */
     const calibScreen = document.getElementById("calibrationScreen");
     const calibSlider = document.getElementById("calibSlider");
     const cardBox = document.getElementById("cardBox");
@@ -194,21 +197,26 @@
     const doneCalib = document.getElementById("doneCalib");
     const calibStatus = document.getElementById("calibStatus");
 
+    /* scaleFactor = px لكل 1mm */
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
 
+    /* تحديث حجم مربع البطاقة */
     function updateCardBox(){
       const hPx = parseFloat(calibSlider.value);
-      const ratio = 53.98 / 85.6;
+      const ratio = 53.98 / 85.6;  
       cardBox.style.height = hPx + "px";
       cardBox.style.width  = (hPx * ratio) + "px";
     }
 
+    /* بدء المعايرة */
     startCalib.addEventListener("click", ()=>{
 
-      // 🔥 أول ما يفتح: المربع يصير صغير
-      calibSlider.min = 50;
-      calibSlider.max = 350;
-      calibSlider.value = 60;  // يبدأ صغير جدًا
+      // أعطي أعلى قيمة 90% من ارتفاع الشاشة
+      const maxPx = Math.round(window.innerHeight * 0.90);
+
+      calibSlider.min = 40;      // صغير جدًا بالبداية
+      calibSlider.max = maxPx;   // يوصل لحجم البطاقة الحقيقي دائمًا
+      calibSlider.value = 60;    // بداية صغيرة
 
       updateCardBox();
       calibScreen.style.display = "block";
@@ -216,22 +224,24 @@
 
     calibSlider.addEventListener("input", updateCardBox);
 
+    /* حفظ المعايرة */
     doneCalib.addEventListener("click", ()=>{
       const px = parseFloat(calibSlider.value);
       const realMM = 85.6;
 
-      scaleFactor = px / realMM;
+      scaleFactor = px / realMM;  
       localStorage.setItem("scaleFactor", scaleFactor);
 
       calibStatus.textContent = "✔ تمت المعايرة بنجاح";
       calibStatus.style.color = "green";
 
       calibScreen.style.display = "none";
-      pxPerMM = scaleFactor;
+      pxPerMM = scaleFactor;  
     });
 
     /* محاكاة المقاسات */
     let pxPerMM = scaleFactor;
+
     const PI = Math.PI;
     const US_MIN = 4, US_MAX = 14;
 
@@ -267,6 +277,7 @@
       slider:$("slider"), sizeLabel:$("sizeLabel"),
       outer:$("outer"), inner:$("inner"), diamond:$("diamond")
     };
+
     let updating=false;
 
     const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
@@ -289,6 +300,7 @@
         el.error.textContent="❌ المقاس خارج النطاق (4 — 14)";
         return;
       }
+
       el.error.textContent="";
 
       const d=usToDiameter(us);
@@ -305,6 +317,7 @@
       updating=false;
 
       el.sizeLabel.textContent=`المقاس الحالي: ${fmt(us,1)} (US)`;
+
       drawRing(d);
       el.laser.textContent=`القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
     }
