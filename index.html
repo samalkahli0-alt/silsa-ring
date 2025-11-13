@@ -1,5 +1,3 @@
-<!-- نفس كودك بالكامل بدون أي تعديل … فقط أضفت مربع الإرشادات -->
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -117,7 +115,7 @@
       gap:14px;
     }
 
-    /* الحاوية اللي تبين نصف الضلع الطويل فقط */
+    /* نصف البطاقة */
     #cardViewport{
       position:relative;
       overflow:hidden;
@@ -169,10 +167,10 @@
     <div class="card">
       <h3>📘 طريقة الاستخدام</h3>
       <div class="step-box">
-        <b>1)</b> اضغط زر <b>“بدء المعايرة”</b>.<br>
+        <b>1)</b> اضغط “بدء المعايرة”.<br>
         <b>2)</b> ضع البطاقة بالعرض، نصفها داخل الشاشة.<br>
         <b>3)</b> طابق نصف البطاقة مع المربع الأبيض.<br>
-        <b>4)</b> حرّك السلايدر حتى يكون المربع نفس نصف البطاقة تمامًا.<br>
+        <b>4)</b> حرّك السلايدر حتى يتطابق الحجم تمامًا.<br>
         <b>5)</b> اضغط حفظ وإغلاق.<br>
       </div>
       <button id="startCalib">بدء المعايرة</button>
@@ -181,21 +179,18 @@
 
     <div class="grid">
 
-      <!-- ============================= -->
-      <!--  ✨ Instructions Box (ADDED)  -->
-      <!-- ============================= -->
+      <!-- 🔥 الإرشادات المضافة (كما طلبت) -->
       <div class="card" style="background:#fffdfa;border:1px solid #f0d9b8">
         <h3 style="margin-top:0;font-size:18px;font-weight:800;color:var(--ink)">🔎 إرشادات معرفة المقاس</h3>
 
         <div style="font-size:14.5px;line-height:1.8;color:var(--muted)">
-          • بعد حفظ المعايرة، الخاتم المعروض على الشاشة يظهر <b>بحجمه الحقيقي 100%</b>.<br>
-          • حط إصبعك فوق الدائرة الداخلية في الرسم.<br>
-          • إذا طابقت الدائرة إصبعك → هذا مقاسك الصحيح.<br>
-          • إذا كانت الدائرة صغيرة عليك → ارفع المقاس شوي.<br>
-          • إذا كانت كبيرة عليك → نزل المقاس شوي.<br>
+          • بعد المعايرة، الخاتم يُعرض بالحجم الحقيقي 100٪.<br>
+          • ضع إصبعك فوق الدائرة الداخلية.<br>
+          • إذا طابقت الدائرة إصبعك → هذا مقاسك.<br>
+          • إذا كانت صغيرة → ارفع المقاس قليلًا.<br>
+          • إذا كانت كبيرة → انزل المقاس قليلًا.<br>
         </div>
       </div>
-      <!-- ============================= -->
 
       <!-- الرسم -->
       <div class="card">
@@ -233,11 +228,198 @@
     </div>
   </div>
 
-  <!-- شاشة المعايرة … (نفس كودك تماماً بدون تعديل) -->
+  <!-- شاشة المعايرة -->
+  <div id="calibrationScreen">
+    <div id="calibCard">
+      <h2>🔧 المعايرة</h2>
+      <p>طابق المستطيل مع <b>نصف البطاقة</b> وهي بالعرض.</p>
 
-  <script>
-    /* نفس سكربتك بالكامل بدون أي تغيير */
-  </script>
+      <div id="calibrationRow">
+        <div id="cardViewport">
+          <div id="cardBox"></div>
+          <div id="halfLine"></div>
+        </div>
+
+        <div id="hintBox">
+          <span>ضع البطاقة هنا على الشاشة</span>
+          <span class="arrow">➔</span>
+        </div>
+      </div>
+
+      <input type="range" id="calibSlider">
+
+      <button id="doneCalib"
+        style="margin-top:16px;padding:12px;border-radius:12px;
+        background:var(--accent);color:white;border:none;font-size:17px;width:100%">
+        حفظ وإغلاق
+      </button>
+    </div>
+  </div>
+
+<script>
+/************* معايرة نصف الضلع الطويل *************/
+const calibScreen  = document.getElementById("calibrationScreen");
+const calibSlider  = document.getElementById("calibSlider");
+const cardBox      = document.getElementById("cardBox");
+const cardViewport = document.getElementById("cardViewport");
+const halfLine     = document.getElementById("halfLine");
+const startCalib   = document.getElementById("startCalib");
+const doneCalib    = document.getElementById("doneCalib");
+const calibStatus  = document.getElementById("calibStatus");
+
+const CARD_LONG_MM  = 85.6;
+const CARD_SHORT_MM = 53.98;
+const CARD_RATIO    = CARD_SHORT_MM / CARD_LONG_MM;
+
+let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
+let pxPerMM     = scaleFactor;
+
+function updateCardBoxFromSlider(){
+  const fullLongPx = parseFloat(calibSlider.value);
+  const fullShortPx = fullLongPx * CARD_RATIO;
+
+  cardBox.style.width  = fullLongPx  + "px";
+  cardBox.style.height = fullShortPx + "px";
+
+  const halfLongPx = fullLongPx / 2;
+
+  cardViewport.style.width  = halfLongPx + "px";
+  cardViewport.style.height = fullShortPx + "px";
+
+  cardBox.style.right = -(fullLongPx / 2) + "px";
+  cardBox.style.top   = "50%";
+  cardBox.style.transform = "translateY(-50%)";
+
+  halfLine.style.height = fullShortPx + "px";
+}
+
+startCalib.addEventListener("click", ()=>{
+  const maxPx = Math.round(window.innerWidth * 2.0);
+
+  calibSlider.min = 140;
+  calibSlider.max = maxPx;
+  calibSlider.value = Math.round((140 + maxPx) / 2);
+
+  updateCardBoxFromSlider();
+  calibScreen.style.display = "block";
+});
+
+calibSlider.addEventListener("input", updateCardBoxFromSlider);
+
+doneCalib.addEventListener("click", ()=>{
+  const fullLongPx = parseFloat(calibSlider.value);
+  scaleFactor = fullLongPx / CARD_LONG_MM;
+  pxPerMM     = scaleFactor;
+
+  localStorage.setItem("scaleFactor", scaleFactor);
+
+  calibStatus.textContent = "✔ تمت المعايرة بنجاح";
+  calibStatus.style.color = "lightgreen";
+
+  calibScreen.style.display = "none";
+
+  const currentUS = parseFloat(document.getElementById("us").value) || 8;
+  updateAllFromUS(currentUS);
+});
+
+/************* حسابات الخاتم *************/
+const PI = Math.PI;
+const US_MIN = 4, US_MAX = 14;
+
+const usToDiameter   = us => 11.63 + 0.8128 * us;
+const diameterToUs   = d  => (d - 11.63) / 0.8128;
+const diameterToCirc = d  => PI * d;
+const usToJP         = us => us + 12;
+
+const UK_STEPS = [
+"H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
+"N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
+"T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
+"Z","Z+½","Z+1"
+];
+
+const usToUK = (us)=>{
+  const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
+  return UK_STEPS[Math.round(Math.min(Math.max(idx,0),UK_STEPS.length-1))];
+};
+
+const normalizeUK = s=>s.trim().toUpperCase().replace("1/2","½");
+const ukToUs = uk=>{
+  const i = UK_STEPS.indexOf(normalizeUK(uk));
+  if(i<0) return null;
+  return US_MIN + (i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
+};
+
+const $ = id => document.getElementById(id);
+const el = {
+  us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"),
+  diameter:$("diameter"), circ:$("circ"),
+  error:$("error"), laser:$("laser"),
+  slider:$("slider"), sizeLabel:$("sizeLabel"),
+  outer:$("outer"), inner:$("inner"), diamond:$("diamond")
+};
+
+let updating = false;
+
+const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
+
+function drawRing(diameterMM){
+  const rPx = (diameterMM/2) * pxPerMM;
+  el.outer.setAttribute('r', rPx);
+  el.inner.setAttribute('r', rPx/1.7);
+
+  const cx=180, cy=190;
+  const dy=cy-rPx-20;
+
+  el.diamond.setAttribute('points',
+    `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
+  );
+}
+
+function updateAllFromUS(us){
+  if(us < US_MIN || us > US_MAX){
+    el.error.textContent="❌ المقاس خارج النطاق (4 — 14)";
+    return;
+  }
+  el.error.textContent="";
+
+  const d  = usToDiameter(us);
+  const c  = diameterToCirc(d);
+  const jp = usToJP(us);
+  const uk = usToUK(us);
+
+  updating=true;
+  el.us.value       = fmt(us,2);
+  el.uk.value       = uk;
+  el.fr.value       = fmt(c,1);
+  el.jp.value       = fmt(jp,1);
+  el.diameter.value = fmt(d,2);
+  el.circ.value     = fmt(c,1);
+  el.slider.value   = us;
+  updating=false;
+
+  el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
+  drawRing(d);
+  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
+}
+
+const tryNum = v =>{
+  if(!v) return null;
+  v = (""+v).trim();
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+el.us.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n)});
+el.uk.addEventListener('input',()=>{if(updating)return;let us=ukToUs(el.uk.value);if(us!=null)updateAllFromUS(us)});
+el.fr.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.fr.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.jp.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.jp.value);if(n!=null)updateAllFromUS(n-12)});
+el.diameter.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.diameter.value);if(n!=null)updateAllFromUS(diameterToUs(n))});
+el.circ.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.slider.addEventListener('input',()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
+
+updateAllFromUS(8);
+</script>
 
 </body>
 </html>
