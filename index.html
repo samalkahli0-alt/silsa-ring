@@ -222,7 +222,7 @@
        1) تحميل الأجهزة من JSON خارجي
     ----------------------------- */
 
-    fetch("data/devices.json")
+    fetch("devices.json")
       .then(res => res.json())
       .then(devices => initDeviceSelector(devices));
 
@@ -410,3 +410,4 @@
 
 </body>
 </html>
+
