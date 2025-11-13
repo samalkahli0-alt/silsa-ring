@@ -230,7 +230,7 @@
   <div id="calibrationScreen">
     <div id="calibCard">
       <h2>🔧 المعايرة</h2>
-      <p>طابق المستطيل مع <b>نصف البطاقة</b> وهي بالعرض على الشاشة.</p>
+      <p>طابق المستطيل مع <b>نصف عرض البطاقة</b> وهي بالعرض على الشاشة.</p>
 
       <div id="calibrationRow">
 
@@ -243,7 +243,7 @@
         <!-- النص + السهم بجانب المربع -->
         <div id="hintBox">
           <span>ضع البطاقة هنا بحيث نصفها على الشاشة</span>
-          <span class="arrow">←</span>
+          <span class="arrow">→</span>
         </div>
       </div>
 
@@ -258,7 +258,7 @@
   </div>
 
   <script>
-    /************* معايرة البطاقة (نصها على الشاشة) *************/
+    /************* معايرة البطاقة (نص العرض) *************/
     const calibScreen  = document.getElementById("calibrationScreen");
     const calibSlider  = document.getElementById("calibSlider");
     const cardBox      = document.getElementById("cardBox");
@@ -268,43 +268,43 @@
     const doneCalib    = document.getElementById("doneCalib");
     const calibStatus  = document.getElementById("calibStatus");
 
-    // أبعاد البطاقة الحقيقيّة (أفقية)
-    const CARD_LONG_MM  = 85.6;   // الضلع الطويل (بالعرض)
-    const CARD_SHORT_MM = 53.98;  // الضلع القصير (الارتفاع)
-    const CARD_RATIO    = CARD_SHORT_MM / CARD_LONG_MM; // ارتفاع/عرض
+    // ✅ الآن المعايرة على "عرض" البطاقة الحقيقي = 53.98mm
+    const CARD_WIDTH_MM  = 53.98; // العرض الحقيقي
+    const CARD_HEIGHT_MM = 85.6;  // الطول الحقيقي
+    const CARD_RATIO     = CARD_HEIGHT_MM / CARD_WIDTH_MM; // الطول/العرض
 
     let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
     let pxPerMM     = scaleFactor;
 
     function updateCardBoxFromSlider(){
-      const fullWidthPx = parseFloat(calibSlider.value); // طول البطاقة بالكامل (الضلع الطويل) بالبكسل
-      const fullHeightPx = fullWidthPx * CARD_RATIO;     // ارتفاع البطاقة بالبكسل بنفس النسبة الحقيقية
+      const fullWidthPx  = parseFloat(calibSlider.value);     // يمثل "عرض البطاقة" بالبكسل
+      const fullHeightPx = fullWidthPx * CARD_RATIO;          // الطول بنفس النسبة الحقيقية
 
-      // حجم البطاقة الحقيقي (كاملة)
+      // حجم البطاقة كامل (لكن بنشتغل على نص العرض في الحاوية)
       cardBox.style.width  = fullWidthPx + "px";
       cardBox.style.height = fullHeightPx + "px";
 
-      // نخلي الحاوية تعرض فقط نصف البطاقة
+      // نخلي الحاوية تعرض نص العرض فقط
       const halfWidthPx = fullWidthPx / 2;
       cardViewport.style.width  = halfWidthPx + "px";
       cardViewport.style.height = fullHeightPx + "px";
 
-      // نحرّك البطاقة بحيث منتصفها عند حافة cardViewport اليمنى
+      // نحرك البطاقة بحيث نص عرضها ظاهر
       cardBox.style.right = -(fullWidthPx / 2) + "px";
       cardBox.style.top   = "50%";
       cardBox.style.transform = "translateY(-50%)";
 
-      // الخط على حافة "نص البطاقة داخل الشاشة"
+      // الخط يتطابق مع طول البطاقة ويصير على حافة نصها داخل الشاشة
       halfLine.style.height = fullHeightPx + "px";
       halfLine.style.right  = "0px";
     }
 
     startCalib.addEventListener("click", ()=>{
-      const maxPx = Math.round(window.innerWidth * 2.0); // يسمح بحجم كافي
+      const maxPx = Math.round(window.innerWidth * 2.0);
 
-      calibSlider.min   = 140;            // بداية: بطاقه صغيرة
+      calibSlider.min   = 80;
       calibSlider.max   = maxPx;
-      calibSlider.value = Math.round((140 + maxPx)/2);
+      calibSlider.value = Math.round((80 + maxPx)/2);
 
       updateCardBoxFromSlider();
       calibScreen.style.display = "block";
@@ -313,10 +313,10 @@
     calibSlider.addEventListener("input", updateCardBoxFromSlider);
 
     doneCalib.addEventListener("click", ()=>{
-      const fullWidthPx = parseFloat(calibSlider.value);
-      const realMM      = CARD_LONG_MM;  // نستخدم طول البطاقة الكامل
+      const fullWidthPx = parseFloat(calibSlider.value); // هذا يمثل عرض البطاقة على الشاشة بالبكسل
+      const realMM      = CARD_WIDTH_MM;                 // ✅ الآن نستخدم عرض البطاقة 53.98mm
 
-      // px لكل 1mm بشكل دقيق
+      // px لكل 1mm من "العرض"
       scaleFactor = fullWidthPx / realMM;
       pxPerMM     = scaleFactor;
       localStorage.setItem("scaleFactor", scaleFactor);
@@ -326,7 +326,7 @@
 
       calibScreen.style.display = "none";
 
-      // نعيد رسم الخاتم بناءً على المعايرة الجديدة
+      // نعيد رسم الخاتم على المقاس الحالي
       const currentUS = parseFloat(document.getElementById("us").value) || 8;
       updateAllFromUS(currentUS);
     });
