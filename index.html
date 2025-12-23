@@ -27,11 +27,14 @@
       margin:0;
       background:var(--bg);
       color:var(--ink);
-      font-family:'Tajawal',system-ui,sans-serif;
+      font-family:'Tajawal',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
     }
 
     .wrap{max-width:1100px;margin:24px auto;padding:16px}
-    .title{font-size:28px;font-weight:800;margin-bottom:14px}
+    .title{
+      font-size:28px;font-weight:800;margin:0 0 14px;
+      display:flex;gap:10px;align-items:center;
+    }
 
     .card{
       background:var(--card);
@@ -41,10 +44,30 @@
       margin-bottom:18px;
     }
 
-    svg{max-width:380px;margin:auto;display:block}
+    .step-box{
+      background:white;padding:14px;border-radius:12px;border:1px solid var(--border);
+      margin-top:8px;font-size:15px;line-height:1.8;
+    }
 
-    .ring-stroke{stroke:#3e000c;stroke-width:6;fill:transparent}
-    .ring-stroke-inner{stroke:#3e000c;stroke-width:3;fill:white}
+    #startCalib{
+      margin-top:14px;padding:12px;border-radius:12px;
+      background:var(--accent);color:white;border:none;
+      font-size:17px;width:100%;cursor:pointer;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+    }
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr;}
+    }
+
+    svg{max-width:380px;height:auto;margin:auto;display:block}
+
+    .ring-stroke{stroke:#3e000c !important;stroke-width:6 !important;fill:transparent}
+    .ring-stroke-inner{stroke:#3e000c !important;stroke-width:3 !important;fill:white}
 
     .diamond{animation:sparkle 1.3s infinite}
     @keyframes sparkle{
@@ -54,138 +77,362 @@
     }
 
     input,select{
-      width:100%;padding:10px;border-radius:12px;
-      border:1px solid var(--border);font-size:16px
+      width:100%;padding:10px 12px;border:1px solid var(--border);
+      border-radius:12px;font-size:16px;background:white;color:var(--ink)
     }
 
-    input[type=range]{appearance:none;height:6px;background:#ead8bb;border-radius:999px}
+    input[type=range]{
+      appearance:none;width:100%;height:6px;border-radius:999px;background:#ead8bb;
+    }
     input[type=range]::-webkit-slider-thumb{
       appearance:none;width:18px;height:18px;border-radius:50%;
       background:var(--accent-2);border:2px solid white;
+    }
+
+    /* شاشة المعايرة */
+    #calibrationScreen{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,.85);backdrop-filter:blur(4px);
+      padding:20px 12px;color:white;text-align:center;z-index:9999;
+    }
+
+    #calibCard{
+      max-width:480px;margin:0 auto;
+      background:rgba(0,0,0,.2);
+      padding:16px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.15);
+    }
+
+    #calibCard h2{margin:0 0 8px;font-size:20px}
+    #calibCard p{margin:0;font-size:14px;color:#f5f5f5}
+
+    #calibrationRow{
+      margin:18px 0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+    }
+
+    /* نصف البطاقة */
+    #cardViewport{
+      position:relative;
+      overflow:hidden;
+      border-radius:12px;
+    }
+
+    #cardBox{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      background:white;
+      border:4px solid #3e000c;
+      border-radius:10px;
+      box-shadow:0 0 12px rgba(0,0,0,.35);
+    }
+
+    #halfLine{
+      position:absolute;
+      top:0;
+      right:0;
+      width:4px;
+      background:#3e000c;
+      border-radius:4px 0 0 4px;
+    }
+
+    #hintBox{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:4px;
+      font-size:14px;
+      color:#fff;
+      text-align:right;
+      max-width:130px;
+    }
+    #hintBox span.arrow{
+      font-size:22px;
+      line-height:1;
     }
   </style>
 </head>
 
 <body>
 
-<div class="wrap">
-  <h1 class="title">💎 اعرف مقاسك</h1>
+  <div class="wrap">
 
-  <div class="card">
-    <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
-      المقاس الحالي: — (US)
+    <h1 class="title">💎 اعرف مقاسك</h1>
+
+    <div class="card">
+      <h3>📘 طريقة الاستخدام</h3>
+      <div class="step-box">
+        <b>1)</b> اضغط<b> “بدء المعايرة”.</b><br>
+        <b>2)</b> ضع <b> “الرخصة او بطاقه الهويه”.</b> بالعرض، على الشاشة.<br>
+        <b>3)</b> طابق نصف البطاقة مع المربع الأبيض.<br>
+        <b>4)</b> حرّك السلايدر حتى يتطابق الحجم تمامًا.<br>
+        <b>5)</b> اضغط حفظ وإغلاق.<br>
+      </div>
+      <button id="startCalib">بدء المعايرة</button>
+      <div id="calibStatus" style="margin-top:8px;color:var(--muted)">لم تتم المعايرة بعد</div>
     </div>
 
-    <svg id="ringSvg" viewBox="0 0 360 360">
-      <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
-      <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
-      <polygon id="diamond" class="diamond"
-        points="180,90 170,100 180,110 190,100"
-        stroke="#5a9bd4" stroke-width="2" />
-    </svg>
+    <div class="grid">
 
-    <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
-  </div>
+      <!-- 🔥 الإرشادات المضافة (كما طلبت) -->
+      <div class="card" style="background:#fffdfa;border:1px solid #f0d9b8">
+        <h3 style="margin-top:0;font-size:18px;font-weight:800;color:var(--ink)">🔎 إرشادات معرفة المقاس</h3>
 
-  <div class="card">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div><label>US</label><input id="us"></div>
-      <div><label>UK</label><input id="uk"></div>
-      <div><label>FR</label><input id="fr"></div>
-      <div><label>JP</label><input id="jp"></div>
-      <div><label>القطر (mm)</label><input id="diameter"></div>
-      <div><label>المحيط (mm)</label><input id="circ"></div>
+        <div style="font-size:14.5px;line-height:1.8;color:var(--muted)">
+          • بعد المعايرة .<br>
+          • ضع خاتمك فوق الدائرة الداخلية.<br>
+          • إذا طابقت الدائرة خاتمك ⬅ هذا مقاسك.<br>
+          • إذا كانت صغيرة ⬅ ارفع المقاس قليلًا.<br>
+          • إذا كانت كبيرة ⬅ انزل المقاس قليلًا.<br>
+        </div>
+      </div>
 
-      <div id="error" style="color:var(--danger);font-weight:bold"></div>
-      <div id="laser" style="color:var(--navy);font-weight:bold"></div>
+
+      <!-- الرسم -->
+      <div class="card">
+        <div id="sizeLabel" style="font-weight:800;font-size:18px;margin-bottom:10px">
+          المقاس الحالي: — (US)
+        </div>
+
+        <svg id="ringSvg" viewBox="0 0 360 360">
+          <circle id="outer" class="ring-stroke" cx="180" cy="190" r="60" />
+          <circle id="inner" class="ring-stroke-inner" cx="180" cy="190" r="35" />
+          <polygon id="diamond" class="diamond"
+            points="180,90 170,100 180,110 190,100"
+            stroke="#5a9bd4" stroke-width="2" fill="#89CFF0" />
+        </svg>
+
+        <input id="slider" type="range" min="4" max="14" step="0.5" value="8" />
+      </div>
+
+      <!-- المدخلات -->
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+          <div><label>المقاس الأمريكي (US)</label><input id="us" inputmode="decimal"></div>
+          <div><label>المقاس البريطاني (UK)</label><input id="uk"></div>
+          <div><label>المقاس الفرنسي (FR)</label><input id="fr" inputmode="decimal"></div>
+          <div><label>المقاس الياباني (JP)</label><input id="jp" inputmode="decimal"></div>
+          <div><label>القطر الداخلي (mm)</label><input id="diameter" inputmode="decimal"></div>
+          <div><label>المحيط (mm)</label><input id="circ" inputmode="decimal"></div>
+
+          <div id="error" style="color:var(--danger);font-weight:bold"></div>
+          <div id="laser" style="color:var(--navy);font-weight:bold"></div>
+        </div>
+      </div>
+
     </div>
   </div>
-</div>
+
+  <!-- شاشة المعايرة -->
+  <div id="calibrationScreen">
+    <div id="calibCard">
+      <h2>🔧 المعايرة</h2>
+      <p>طابق المستطيل مع <b>نصف البطاقة</b> وهي بالعرض.</p>
+
+      <div id="calibrationRow">
+        <div id="cardViewport">
+          <div id="cardBox"></div>
+          <div id="halfLine"></div>
+        </div>
+
+        <div id="hintBox">
+          <span>ضع البطاقة هنا على الشاشة</span>
+          <span class="arrow">➔</span>
+        </div>
+      </div>
+
+      <input type="range" id="calibSlider">
+
+      <button id="doneCalib"
+        style="margin-top:16px;padding:12px;border-radius:12px;
+        background:var(--accent);color:white;border:none;font-size:17px;width:100%">
+        حفظ وإغلاق
+      </button>
+    </div>
+  </div>
 
 <script>
-/************* ثوابت *************/
-const PI = Math.PI;
-const US_MIN = 4, US_MAX = 14;
-let pxPerMM = 6.8;
+/************* معايرة نصف الضلع الطويل *************/
+const calibScreen  = document.getElementById("calibrationScreen");
+const calibSlider  = document.getElementById("calibSlider");
+const cardBox      = document.getElementById("cardBox");
+const cardViewport = document.getElementById("cardViewport");
+const halfLine     = document.getElementById("halfLine");
+const startCalib   = document.getElementById("startCalib");
+const doneCalib    = document.getElementById("doneCalib");
+const calibStatus  = document.getElementById("calibStatus");
 
-/************* تحويلات *************/
-const usToDiameter = us => 11.63 + 0.8128 * us;
-const diameterToUs = d  => (d - 11.63) / 0.8128;
-const usToJP = us => us + 12;
-const diameterToCirc = d => PI * d;
+const CARD_LONG_MM  = 85.6;
+const CARD_SHORT_MM = 53.98;
+const CARD_RATIO    = CARD_SHORT_MM / CARD_LONG_MM;
 
-/************* منطق الماكينة (Refactor) *************/
-function getMachineCircumference(diameterMM){
-  return PI * diameterMM; // محيط دائري مغلق بالملّيمتر
+let scaleFactor = localStorage.scaleFactor ? parseFloat(localStorage.scaleFactor) : 6.8;
+let pxPerMM     = scaleFactor;
+
+function updateCardBoxFromSlider(){
+  const fullLongPx  = parseFloat(calibSlider.value);
+  const fullShortPx = fullLongPx * CARD_RATIO;
+
+  cardBox.style.width  = fullLongPx  + "px";
+  cardBox.style.height = fullShortPx + "px";
+
+  const halfLongPx = fullLongPx / 2;
+
+  cardViewport.style.width  = halfLongPx + "px";
+  cardViewport.style.height = fullShortPx + "px";
+
+  cardBox.style.right = -(fullLongPx / 2) + "px";
+  cardBox.style.top   = "50%";
+  cardBox.style.transform = "translateY(-50%)";
+
+  halfLine.style.height = fullShortPx + "px";
 }
 
-/************* عناصر *************/
+startCalib.addEventListener("click", ()=>{
+  const maxPx = Math.round(window.innerWidth * 2.0);
+
+  calibSlider.min   = 140;
+  calibSlider.max   = maxPx;
+  calibSlider.value = Math.round((140 + maxPx) / 2);
+
+  updateCardBoxFromSlider();
+  calibScreen.style.display = "block";
+});
+
+calibSlider.addEventListener("input", updateCardBoxFromSlider);
+
+doneCalib.addEventListener("click", ()=>{
+  const fullLongPx = parseFloat(calibSlider.value);
+  scaleFactor = fullLongPx / CARD_LONG_MM;
+  pxPerMM     = scaleFactor;
+
+  localStorage.setItem("scaleFactor", scaleFactor);
+
+  calibStatus.textContent = "✔ تمت المعايرة بنجاح";
+  calibStatus.style.color = "lightgreen";
+
+  calibScreen.style.display = "none";
+
+  const currentUS = parseFloat(document.getElementById("us").value) || 8;
+  updateAllFromUS(currentUS);
+});
+
+/************* حسابات الخاتم *************/
+const PI = Math.PI;
+const US_MIN = 4, US_MAX = 14;
+
+const usToDiameter   = us => 11.63 + 0.8128 * us;
+const diameterToUs   = d  => (d - 11.63) / 0.8128;
+const diameterToCirc = d  => PI * d;
+const usToJP         = us => us + 12;
+
+const UK_STEPS = [
+  "H","H½","I","I½","J","J½","K","K½","L","L½","M","M½",
+  "N","N½","O","O½","P","P½","Q","Q½","R","R½","S","S½",
+  "T","T½","U","U½","V","V½","W","W½","X","X½","Y","Y½",
+  "Z","Z+½","Z+1"
+];
+
+const usToUK = (us)=>{
+  const idx=(us-US_MIN)/(US_MAX-US_MIN)*(UK_STEPS.length-1);
+  return UK_STEPS[Math.round(Math.min(Math.max(idx,0),UK_STEPS.length-1))];
+};
+
+const normalizeUK = s=>s.trim().toUpperCase().replace("1/2","½");
+const ukToUs = uk=>{
+  const i = UK_STEPS.indexOf(normalizeUK(uk));
+  if(i<0) return null;
+  return US_MIN + (i/(UK_STEPS.length-1))*(US_MAX-US_MIN);
+};
+
 const $ = id => document.getElementById(id);
 const el = {
   us:$("us"), uk:$("uk"), fr:$("fr"), jp:$("jp"),
   diameter:$("diameter"), circ:$("circ"),
-  slider:$("slider"),
-  sizeLabel:$("sizeLabel"),
-  error:$("error"),
-  laser:$("laser"),
-  inner:$("inner"), outer:$("outer"), diamond:$("diamond")
+  error:$("error"), laser:$("laser"),
+  slider:$("slider"), sizeLabel:$("sizeLabel"),
+  outer:$("outer"), inner:$("inner"), diamond:$("diamond")
 };
 
 let updating = false;
-const fmt = n => Number(n).toFixed(2).replace(/\.00$/,'');
 
-/************* الرسم *************/
+const fmt=(n,d=2)=>Number(n).toFixed(d).replace(/\.0+$/,'').replace(/\.$/,'');
+
+/* ✅ هنا التعديل المهم: الدائرة الداخلية = القطر الحقيقي */
 function drawRing(diameterMM){
-  const innerR = (diameterMM / 2) * pxPerMM;
-  const outerR = innerR + 6;
+  const cx = 180, cy = 190;
 
+  // نصف القطر الحقيقي بالـ px (الداخلي)
+  const innerR = (diameterMM / 2) * pxPerMM;
+
+  // سماكة الخاتم (شكل فقط) مثلاً 6px
+  const bandThickness = 6;
+  const outerR = innerR + bandThickness;
+
+  // الدائرة الداخلية = القطر الحقيقي
   el.inner.setAttribute('r', innerR);
+
+  // الدائرة الخارجية أكبر بشوي كإطار
   el.outer.setAttribute('r', outerR);
 
-  const cx = 180, cy = 190;
+  // نحط الألماسة فوق الخاتم عند الحافة الخارجية
   const dy = cy - outerR - 20;
-  el.diamond.setAttribute(
-    'points',
+  el.diamond.setAttribute('points',
     `${cx},${dy-8} ${cx-10},${dy} ${cx},${dy+8} ${cx+10},${dy}`
   );
 }
 
-/************* التحديث الرئيسي *************/
 function updateAllFromUS(us){
   if(us < US_MIN || us > US_MAX){
-    el.error.textContent = "❌ المقاس خارج النطاق";
+    el.error.textContent="❌ المقاس خارج النطاق (4 — 14)";
     return;
   }
-  el.error.textContent = "";
+  el.error.textContent="";
 
-  const d = usToDiameter(us);                 // القطر الحقيقي
-  const c = getMachineCircumference(d);       // ⭐ قيمة الماكينة
+  const d  = usToDiameter(us);
+  const c  = diameterToCirc(d);
+  const jp = usToJP(us);
+  const uk = usToUK(us);
 
-  updating = true;
-  el.us.value = fmt(us);
-  el.fr.value = fmt(c);
-  el.jp.value = fmt(usToJP(us));
-  el.diameter.value = fmt(d);
-  el.circ.value = fmt(c);
-  el.slider.value = us;
-  updating = false;
+  updating=true;
+  el.us.value       = fmt(us,2);
+  el.uk.value       = uk;
+  el.fr.value       = fmt(c,1);
+  el.jp.value       = fmt(jp,1);
+  el.diameter.value = fmt(d,2);
+  el.circ.value     = fmt(c,1);
+  el.slider.value   = us;
+  updating=false;
 
-  el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us)} (US)`;
-  el.laser.textContent = `⚙️ قيمة القص (محيط دائري مغلق): ${fmt(c)} mm`;
-
+  el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
   drawRing(d);
+  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
 }
 
-/************* أحداث *************/
-el.slider.addEventListener('input', e=>{
-  if(!updating) updateAllFromUS(parseFloat(e.target.value));
-});
-el.us.addEventListener('input', e=>{
-  if(!updating) updateAllFromUS(parseFloat(e.target.value));
-});
+const tryNum = v =>{
+  if(!v) return null;
+  v = (""+v).trim();
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+el.us.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.us.value);if(n!=null)updateAllFromUS(n)});
+el.uk.addEventListener('input',()=>{if(updating)return;let us=ukToUs(el.uk.value);if(us!=null)updateAllFromUS(us)});
+el.fr.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.fr.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.jp.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.jp.value);if(n!=null)updateAllFromUS(n-12)});
+el.diameter.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.diameter.value);if(n!=null)updateAllFromUS(diameterToUs(n))});
+el.circ.addEventListener('input',()=>{if(updating)return;let n=tryNum(el.circ.value);if(n!=null)updateAllFromUS(diameterToUs(n/PI))});
+el.slider.addEventListener('input',()=>{if(!updating)updateAllFromUS(parseFloat(el.slider.value))});
 
 updateAllFromUS(8);
 </script>
 
 </body>
 </html>
+
