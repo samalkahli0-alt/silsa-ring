@@ -412,7 +412,7 @@ function updateAllFromUS(us){
 
   el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
   drawRing(d);
-  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,3)} mm`;
+  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
 }
 
 const tryNum = v =>{
@@ -435,6 +435,7 @@ updateAllFromUS(8);
 
 </body>
 </html>
+
 
 
 
