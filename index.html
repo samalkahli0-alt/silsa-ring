@@ -412,7 +412,14 @@ function updateAllFromUS(us){
 
   el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
   drawRing(d);
-  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c + 3,1)} mm`;
+ const d = usToDiameter(us); // القطر الداخلي
+const thickness = 1;       // سماكة المعدن (mm)
+
+const laserValue = cutCircumference(d, thickness);
+
+el.laser.textContent =
+  `قيمة الماكينة: ${fmt(laserValue,1)} mm`;
+
 }
 
 const tryNum = v =>{
@@ -435,6 +442,7 @@ updateAllFromUS(8);
 
 </body>
 </html>
+
 
 
 
