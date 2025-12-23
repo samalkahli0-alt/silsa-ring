@@ -406,13 +406,13 @@ function updateAllFromUS(us){
   el.fr.value       = fmt(c,1);
   el.jp.value       = fmt(jp,1);
   el.diameter.value = fmt(d,2);
-  el.circ.value     = fmt(c,1);
+  el.circ.value     = fmt(c,1)+3;
   el.slider.value   = us;
   updating=false;
 
   el.sizeLabel.textContent = `المقاس الحالي: ${fmt(us,1)} (US)`;
   drawRing(d);
-  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)+3} mm`;
+  el.laser.textContent = `القيمة المستخدمة للماكينة: ${fmt(c,1)} mm`;
 }
 
 const tryNum = v =>{
@@ -435,5 +435,6 @@ updateAllFromUS(8);
 
 </body>
 </html>
+
 
 
